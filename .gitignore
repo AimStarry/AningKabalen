@@ -1,0 +1,15 @@
+# Node Dependencies (The most important to ignore!)
+node_modules/
+dist/
+
+# Angular-specific
+.angular/
+.output/
+
+# Environment Variables
+.env
+
+# OS Files (Keep your repo clean)
+.DS_Store
+Thumbs.db
+.qodo/
