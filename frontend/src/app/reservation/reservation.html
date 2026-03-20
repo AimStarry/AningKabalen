@@ -1,0 +1,139 @@
+<app-navbar></app-navbar>
+
+<div class="rsv-page" @fadeUp>
+
+  <!-- SUCCESS -->
+  <div class="success-wrap" *ngIf="submitted">
+    <div class="success-icon">📋</div>
+    <h2>Reservation Submitted!</h2>
+    <p>Your reservation is <strong>pending farmer confirmation</strong>. You'll be notified once the farmer accepts. Reservations expire in 48 hours if not confirmed.</p>
+    <div class="success-actions">
+      <a routerLink="/profile" class="btn-primary">View My Reservations</a>
+      <a routerLink="/products" class="btn-secondary">Continue Browsing</a>
+    </div>
+  </div>
+
+  <div class="rsv-layout" *ngIf="!submitted">
+    <!-- LEFT: Listing picker -->
+    <div class="rsv-left">
+      <div class="rsv-header">
+        <h1>Reserve a Crop</h1>
+        <p class="rsv-subtitle">Pre-book crops directly from farmers. The farmer confirms your reservation within 48 hours.</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-row">
+        <div class="search-box">
+          <svg viewBox="0 0 20 20" fill="none" stroke="#9ca3af" stroke-width="1.8" width="16" height="16"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/></svg>
+          <input type="text" placeholder="Search crop..." [(ngModel)]="searchTerm" (input)="loadListings()" class="search-input">
+        </div>
+        <select [(ngModel)]="selectedFarm" (change)="onFilterChange()" class="filter-sel">
+          <option value="">All Farmers</option>
+          <option *ngFor="let f of farmers" [value]="f._id">{{ f.farm_details?.farm_name ?? f.name }}</option>
+        </select>
+      </div>
+
+      <!-- Listing cards -->
+      <div class="loading-msg" *ngIf="loading">Loading available crops...</div>
+      <div class="listing-grid" *ngIf="!loading">
+        <div class="listing-card" *ngFor="let d of filtered" [class.selected]="d.checked" (click)="d.checked = !d.checked">
+          <div class="listing-check">
+            <input type="checkbox" [(ngModel)]="d.checked" (click)="$event.stopPropagation()">
+          </div>
+          <img [src]="getImage(d.listing)" [alt]="d.listing.crop_name" class="listing-img">
+          <div class="listing-info">
+            <p class="listing-cat">{{ getCatName(d.listing) }}</p>
+            <h4 class="listing-name">{{ d.listing.crop_name }}</h4>
+            <p class="listing-farm">{{ getFarmerName(d.listing) }}</p>
+            <p class="listing-avail">{{ d.listing.available_kg }} {{ d.listing.unit }} available</p>
+          </div>
+          <div class="listing-right">
+            <p class="listing-price">₱{{ d.listing.price_per_kg }}/{{ d.listing.unit }}</p>
+            <div class="qty-ctrl" (click)="$event.stopPropagation()">
+              <button class="qty-btn" (click)="d.qty = d.qty > 1 ? d.qty - 1 : 1" [disabled]="!d.checked">−</button>
+              <span class="qty-val">{{ d.qty }}</span>
+              <button class="qty-btn" (click)="d.qty = d.qty < d.listing.available_kg ? d.qty + 1 : d.qty" [disabled]="!d.checked">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="filtered.length === 0">No crops found.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Reservation summary form -->
+    <div class="rsv-right">
+      <div class="rsv-summary-card">
+        <h3>Reservation Summary</h3>
+
+        <!-- Selected items -->
+        <div class="summary-items" *ngIf="checkedItems.length > 0">
+          <div class="summary-item" *ngFor="let d of checkedItems">
+            <img [src]="getImage(d.listing)" [alt]="d.listing.crop_name" class="sum-img">
+            <div class="sum-info">
+              <p class="sum-name">{{ d.listing.crop_name }}</p>
+              <p class="sum-detail">{{ d.qty }} {{ d.listing.unit }} × ₱{{ d.listing.price_per_kg }}</p>
+            </div>
+            <span class="sum-price">₱{{ (d.qty * d.listing.price_per_kg).toFixed(2) }}</span>
+          </div>
+        </div>
+        <div class="no-selection" *ngIf="checkedItems.length === 0">
+          <p>← Select crops from the list to reserve</p>
+        </div>
+
+        <!-- Total -->
+        <div class="summary-total" *ngIf="checkedItems.length > 0">
+          <span>Estimated Total</span>
+          <span class="total-val">₱{{ total.toFixed(2) }}</span>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="rsv-form">
+          <!-- Pickup date -->
+          <div class="form-group">
+            <label>Preferred Pickup Date <span class="req">*</span></label>
+            <input type="date" formControlName="pickup_date" class="form-input"
+                   [min]="pickupDate">
+          </div>
+
+          <!-- Payment method -->
+          <div class="form-group">
+            <label>Payment Method</label>
+            <div class="pay-opts">
+              <label class="pay-opt" [class.active]="selectedPayment === 'gcash'">
+                <input type="radio" [(ngModel)]="selectedPayment" [ngModelOptions]="{standalone:true}" value="gcash"> GCash
+              </label>
+              <label class="pay-opt" [class.active]="selectedPayment === 'maya'">
+                <input type="radio" [(ngModel)]="selectedPayment" [ngModelOptions]="{standalone:true}" value="maya"> Maya
+              </label>
+              <label class="pay-opt" [class.active]="selectedPayment === 'cod'">
+                <input type="radio" [(ngModel)]="selectedPayment" [ngModelOptions]="{standalone:true}" value="cod"> COD
+              </label>
+              <label class="pay-opt" [class.active]="selectedPayment === 'visa'">
+                <input type="radio" [(ngModel)]="selectedPayment" [ngModelOptions]="{standalone:true}" value="visa"> Card
+              </label>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="form-group">
+            <label>Notes to Farmer (optional)</label>
+            <textarea formControlName="notes" class="form-input" rows="2"
+                      placeholder="Any special instructions or requests..."></textarea>
+          </div>
+
+          <div class="error-msg" *ngIf="error">{{ error }}</div>
+
+          <div class="rsv-info-box">
+            <span>ℹ️</span>
+            <p>The farmer will confirm your reservation. Payment is collected at pickup.</p>
+          </div>
+
+          <button type="submit" class="btn-reserve" [disabled]="submitting || checkedItems.length === 0">
+            {{ submitting ? 'Submitting...' : 'Submit Reservation' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

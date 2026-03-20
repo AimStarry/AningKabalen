@@ -1,0 +1,82 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <!-- FORM SIDE -->
+    <div class="auth-form-side">
+      <a routerLink="/home" class="auth-back">← Back to Home</a>
+      <p class="auth-greeting">Welcome to AningKabalen 🌿</p>
+      <h1 class="auth-title">{{ isLogin ? 'Sign In' : 'Create Account' }}</h1>
+
+      <div class="error-box" *ngIf="error">⚠ {{ error }}</div>
+
+      <form (ngSubmit)="submit()" class="auth-form">
+        <ng-container *ngIf="!isLogin">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" [(ngModel)]="name" name="name" placeholder="Juan dela Cruz" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" [(ngModel)]="phone" name="phone" placeholder="+63 917 000 0000" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">I want to</label>
+            <div class="role-wrap">
+              <button type="button" class="role-btn" [class.active]="role==='buyer'"  (click)="role='buyer'">🛒 Buy Produce</button>
+              <button type="button" class="role-btn" [class.active]="role==='farmer'" (click)="role='farmer'">🌾 Sell as Farmer</button>
+            </div>
+          </div>
+        </ng-container>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" [(ngModel)]="email" name="email" placeholder="email@example.com" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="pw-wrap">
+            <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" placeholder="••••••••" class="form-input" required minlength="6">
+            <button type="button" class="pw-eye" (click)="showPassword=!showPassword">{{ showPassword ? '🙈' : '👁' }}</button>
+          </div>
+        </div>
+
+        <a *ngIf="isLogin" class="forgot-link">Forgot password?</a>
+
+        <button type="submit" class="btn-submit" [disabled]="loading">
+          {{ loading ? (isLogin ? 'Signing in...' : 'Creating account...') : (isLogin ? 'Sign In' : 'Create Account') }}
+        </button>
+      </form>
+
+      <p class="switch-row">
+        {{ isLogin ? "Don't have an account?" : 'Already have an account?' }}
+        <span class="switch-link" (click)="toggle()">{{ isLogin ? 'Sign Up' : 'Sign In' }}</span>
+      </p>
+
+      <div class="demo-section" *ngIf="isLogin">
+        <p class="demo-label">Quick Demo Login</p>
+        <div class="demo-row">
+          <button type="button" class="demo-btn" (click)="demoLogin('buyer')">🛒 Buyer</button>
+          <button type="button" class="demo-btn" (click)="demoLogin('farmer')">🌾 Farmer</button>
+          <button type="button" class="demo-btn" (click)="demoLogin('admin')">⚙ Admin</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISUAL SIDE -->
+    <div class="auth-visual">
+      <div class="visual-blob visual-blob-1"></div>
+      <div class="visual-blob visual-blob-2"></div>
+      <div class="visual-content">
+        <span class="visual-emoji">🧑‍🌾</span>
+        <h2>Fresh from the<br>Farm, Direct to You</h2>
+        <p>Join thousands of buyers and farmers on the Philippines' most trusted farm-to-table marketplace.</p>
+        <div class="visual-features">
+          <div class="visual-feat"><div class="feat-check">✓</div> Buy directly from verified farmers</div>
+          <div class="visual-feat"><div class="feat-check">✓</div> Reserve upcoming harvests</div>
+          <div class="visual-feat"><div class="feat-check">✓</div> Only 2% platform fee</div>
+          <div class="visual-feat"><div class="feat-check">✓</div> 100% farm-fresh guarantee</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

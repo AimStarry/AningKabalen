@@ -1,0 +1,98 @@
+<app-navbar></app-navbar>
+
+<div class="page-wrap" *ngIf="!loading" @fadeUp>
+  <nav class="breadcrumb">
+    <a routerLink="/home">Home</a> &rsaquo;
+    <a routerLink="/products">Goods</a> &rsaquo;
+    <span>{{ getCatName() }}</span> &rsaquo;
+    <span class="crumb-active">{{ listing?.crop_name }}</span>
+  </nav>
+  <a routerLink="/products" class="back-btn">&#8592; Back to Products</a>
+
+  <div class="detail-layout">
+    <!-- IMAGE GALLERY -->
+    <div class="gallery">
+      <div class="main-img-wrap">
+        <img [src]="getImage(activeImg)" [alt]="listing?.crop_name" class="main-img">
+        <span class="badge-available" *ngIf="listing?.status === 'available'">In Stock</span>
+        <span class="badge-sold" *ngIf="listing?.status === 'sold_out'">Sold Out</span>
+      </div>
+      <div class="thumb-row" *ngIf="listing && listing.images.length > 1">
+        <img *ngFor="let img of listing.images; let i = index"
+             [src]="img" [alt]="'Image ' + (i+1)"
+             class="thumb" [class.active]="i === activeImg"
+             (click)="activeImg = i">
+      </div>
+    </div>
+
+    <!-- PRODUCT INFO -->
+    <div class="product-info">
+      <p class="cat-tag">{{ getCatName() }}</p>
+      <h1>{{ listing?.crop_name }}
+        <span *ngIf="listing?.variety" class="variety">· {{ listing?.variety }}</span>
+      </h1>
+
+      <a [routerLink]="['/farm', getFarmerId()]" class="farm-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        {{ getFarmName() }}
+        <span class="farm-rating" *ngIf="getFarmerRating() > 0">⭐ {{ getFarmerRating() }}</span>
+      </a>
+
+      <div class="price-row">
+        <span class="price">₱{{ listing?.price_per_kg?.toFixed(2) }}</span>
+        <span class="per-unit">/ {{ listing?.unit }}</span>
+      </div>
+
+      <p class="avail-note">{{ listing?.available_kg }} {{ listing?.unit }} available</p>
+      <p class="description">{{ listing?.description }}</p>
+
+      <!-- TAGS -->
+      <div class="tags" *ngIf="listing && listing.tags?.length">
+        <span class="tag" *ngFor="let tag of listing.tags">{{ tag }}</span>
+      </div>
+
+      <!-- QTY + ADD TO CART -->
+      <div class="qty-row" *ngIf="listing?.status === 'available'">
+        <div class="qty-ctrl">
+          <button class="qty-btn" (click)="dec()">−</button>
+          <span class="qty-val">{{ quantity }}</span>
+          <button class="qty-btn" (click)="inc()">+</button>
+        </div>
+        <button class="btn-add-cart" (click)="addToCart()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          Add to Cart
+        </button>
+      </div>
+      <div class="added-toast" *ngIf="addedMsg">✓ Added to cart!</div>
+      <div class="reserve-cta" *ngIf="listing?.status === 'available'">
+        <a routerLink="/reservation" class="btn-reserve">Reserve this Crop</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEWS -->
+  <section class="reviews-section" *ngIf="reviews.length > 0">
+    <h3>Customer Reviews</h3>
+    <div class="review-list">
+      <div class="review-card" *ngFor="let r of reviews">
+        <div class="review-header">
+          <img [src]="r.reviewer_id?.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40'" class="reviewer-avatar" [alt]="r.reviewer_id?.name">
+          <div>
+            <p class="reviewer-name">{{ r.reviewer_id?.name }}</p>
+            <div class="stars">
+              <span *ngFor="let s of [1,2,3,4,5]" [class.filled]="s <= r.rating">★</span>
+            </div>
+          </div>
+          <span class="review-date">{{ r.created_at | date:'mediumDate' }}</span>
+        </div>
+        <p class="review-comment">{{ r.comment }}</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="loading-state" *ngIf="loading">
+  <p>Loading product details...</p>
+</div>
+
+<app-footer></app-footer>

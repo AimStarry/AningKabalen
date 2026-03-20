@@ -1,0 +1,38 @@
+<app-navbar></app-navbar>
+<div class="page-wrap" @fadeUp>
+  <a routerLink="/profile" class="back-btn">&#8592; Back to Profile</a>
+  <div class="loading-state" *ngIf="loading"><p>Loading order details...</p></div>
+  <div class="order-wrap" *ngIf="!loading && transaction">
+    <div class="order-header">
+      <h1>Order #{{ transaction._id.slice(-8).toUpperCase() }}</h1>
+      <span class="pill" [ngClass]="getStatusClass(transaction.status)">{{ transaction.status | titlecase }}</span>
+    </div>
+    <div class="order-layout">
+      <div class="order-item-card">
+        <img [src]="getCropImage()" [alt]="getCropName()" class="crop-img">
+        <div class="item-details">
+          <h3>{{ getCropName() }}</h3>
+          <p class="farm-link-text">{{ getFarmName() }} · by {{ getFarmerName() }}</p>
+          <p class="item-qty">{{ transaction.quantity_kg }} kg × ₱{{ transaction.unit_price }}</p>
+          <div class="price-breakdown">
+            <div class="prow"><span>Subtotal</span><span>₱{{ transaction.subtotal.toFixed(2) }}</span></div>
+            <div class="prow"><span>Platform fee</span><span>₱{{ transaction.platform_fee.toFixed(2) }}</span></div>
+            <div class="prow total"><span>Total</span><span>₱{{ transaction.total_amount.toFixed(2) }}</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="order-meta-card">
+        <h4>Order Info</h4>
+        <div class="meta-row"><span>Type</span><span>{{ transaction.type | titlecase }}</span></div>
+        <div class="meta-row"><span>Payment</span><span>{{ transaction.payment_method }}</span></div>
+        <div class="meta-row"><span>Payment Status</span><span>{{ transaction.payment_status | titlecase }}</span></div>
+        <div class="meta-row" *ngIf="transaction.pickup_date"><span>Pickup Date</span><span>{{ transaction.pickup_date | date:'mediumDate' }}</span></div>
+        <div class="meta-row"><span>Order Date</span><span>{{ transaction.created_at | date:'medium' }}</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="not-found" *ngIf="!loading && !transaction">
+    <p>Order not found. <a routerLink="/profile">Back to profile →</a></p>
+  </div>
+</div>
+<app-footer></app-footer>

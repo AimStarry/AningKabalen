@@ -1,0 +1,125 @@
+<app-navbar></app-navbar>
+
+<div class="profile-page" @fadeUp>
+  <div class="profile-wrap">
+
+    <!-- USER CARD -->
+    <div class="user-card" *ngIf="user">
+      <div class="user-avatar">{{ user.name.charAt(0) }}</div>
+      <div class="user-info">
+        <h2>{{ user.name }}</h2>
+        <p class="user-email">{{ user.email }}</p>
+        <p class="user-phone">{{ user.phone }}</p>
+        <div class="user-meta">
+          <span class="user-role">{{ user.role | titlecase }}</span>
+          <span class="user-verified" *ngIf="user.is_verified">✓ Verified</span>
+        </div>
+      </div>
+      <div class="user-actions">
+        <a routerLink="/reservation" class="btn-reserve-now">+ Reserve Crops</a>
+        <a routerLink="/products" class="btn-shop-now">Shop Now</a>
+        <button class="btn-logout" (click)="logout()">Log Out</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn" [class.active]="activeTab === 'orders'" (click)="activeTab = 'orders'">
+        <span class="tab-icon">🛒</span>
+        My Orders
+        <span class="tab-count" [class.has-items]="orders.length > 0">{{ orders.length }}</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'reservations'" (click)="activeTab = 'reservations'">
+        <span class="tab-icon">📋</span>
+        My Reservations
+        <span class="tab-count" [class.has-items]="reservations.length > 0">{{ reservations.length }}</span>
+      </button>
+    </div>
+
+    <!-- PROCESS EXPLAINER -->
+    <div class="process-bar" *ngIf="!loading">
+      <div class="process-step" *ngIf="activeTab === 'orders'">
+        <span class="step-dot active">1</span><span class="step-label">Ordered</span>
+        <span class="step-line"></span>
+        <span class="step-dot">2</span><span class="step-label">Processing</span>
+        <span class="step-line"></span>
+        <span class="step-dot">3</span><span class="step-label">Completed</span>
+      </div>
+      <div class="process-step" *ngIf="activeTab === 'reservations'">
+        <span class="step-dot active">1</span><span class="step-label">Reserved</span>
+        <span class="step-line"></span>
+        <span class="step-dot">2</span><span class="step-label">Farmer Confirms</span>
+        <span class="step-line"></span>
+        <span class="step-dot">3</span><span class="step-label">Pickup</span>
+      </div>
+    </div>
+
+    <div class="loading-msg" *ngIf="loading">Loading your activity...</div>
+
+    <!-- ─── ORDERS ──────────────────────────────────── -->
+    <div class="data-section" *ngIf="!loading && activeTab === 'orders'">
+      <div class="section-note">
+        <strong>Direct Orders</strong> — You purchased items from available stock. Payment is collected at delivery.
+      </div>
+      <div class="empty-state" *ngIf="orders.length === 0">
+        <div class="empty-icon">🛒</div>
+        <p>No orders yet.</p>
+        <a routerLink="/products" class="link-btn">Browse Products →</a>
+      </div>
+      <div class="activity-card" *ngFor="let t of orders" (click)="viewOrder(t._id)">
+        <img [src]="getOrderImage(t) || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=60'"
+             class="act-img" [alt]="getOrderCrop(t)">
+        <div class="act-info">
+          <div class="act-header">
+            <h4 class="act-name">{{ getOrderCrop(t) }}</h4>
+            <span class="pill" [ngClass]="statusClass(t.status)">{{ statusLabel(t.status) }}</span>
+          </div>
+          <p class="act-farmer">Farmer: {{ getOrderFarmer(t) }}</p>
+          <p class="act-detail">{{ t.quantity_kg }} {{ (t.listing_id | json) ? 'kg' : 'kg' }} · ₱{{ t.total_amount.toFixed(2) }} total · {{ t.payment_method | titlecase }}</p>
+          <p class="act-date">Ordered {{ t.created_at | date:'mediumDate' }}</p>
+        </div>
+        <div class="act-actions">
+          <button class="btn-cancel-act" *ngIf="t.status === 'pending' || t.status === 'confirmed'"
+                  (click)="$event.stopPropagation(); cancelOrder(t)">Cancel</button>
+          <span class="act-arrow">›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── RESERVATIONS ──────────────────────────── -->
+    <div class="data-section" *ngIf="!loading && activeTab === 'reservations'">
+      <div class="section-note">
+        <strong>Crop Reservations</strong> — Pre-booked crops pending farmer confirmation. Payment collected at pickup.
+      </div>
+      <div class="empty-state" *ngIf="reservations.length === 0">
+        <div class="empty-icon">📋</div>
+        <p>No reservations yet.</p>
+        <a routerLink="/reservation" class="link-btn">Reserve a Crop →</a>
+      </div>
+      <div class="activity-card reservation-card" *ngFor="let r of reservations">
+        <img [src]="getResImage(r) || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=60'"
+             class="act-img" [alt]="getResCrop(r)">
+        <div class="act-info">
+          <div class="act-header">
+            <h4 class="act-name">{{ getResCrop(r) }}</h4>
+            <span class="pill" [ngClass]="statusClass(r.status)">{{ statusLabel(r.status) }}</span>
+          </div>
+          <p class="act-farmer">Farmer: {{ getResFarmer(r) }}</p>
+          <p class="act-detail">{{ r.quantity_kg }} kg · ₱{{ r.total_amount.toFixed(2) }} · {{ r.payment_method }}</p>
+          <p class="act-pickup" *ngIf="r.pickup_schedule">📅 Pickup: {{ r.pickup_schedule | date:'mediumDate' }}</p>
+          <p class="act-date">Reserved {{ r.created_at | date:'mediumDate' }}</p>
+          <div class="pending-note" *ngIf="r.status === 'pending'">
+            ⏳ Waiting for farmer to confirm. Expires in 48h.
+          </div>
+        </div>
+        <div class="act-actions">
+          <button class="btn-cancel-act" *ngIf="r.status === 'pending'"
+                  (click)="cancelReservation(r)">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<app-footer></app-footer>

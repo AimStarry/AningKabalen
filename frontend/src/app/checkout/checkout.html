@@ -1,0 +1,93 @@
+<app-navbar></app-navbar>
+
+<div class="checkout-page" @fadeUp>
+  <div class="checkout-wrap">
+    <h1>Checkout</h1>
+
+    <!-- REDIRECT if empty -->
+    <div class="empty-cart-msg" *ngIf="cart.items().length === 0 && !submitted">
+      <p>Your cart is empty. <a routerLink="/products">Shop now →</a></p>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-wrap" *ngIf="submitted">
+      <div class="success-icon">✅</div>
+      <h2>Order Placed!</h2>
+      <p>Thank you! Your order has been submitted. The farmer will confirm shortly.</p>
+      <div class="success-actions">
+        <a routerLink="/profile" class="btn-primary">View My Orders</a>
+        <a routerLink="/products" class="btn-secondary">Continue Shopping</a>
+      </div>
+    </div>
+
+    <div class="checkout-layout" *ngIf="cart.items().length > 0 && !submitted">
+
+      <!-- LEFT: Details form -->
+      <div class="checkout-form">
+        <h3>Delivery Details</h3>
+        <div class="error-msg" *ngIf="error">{{ error }}</div>
+
+        <div class="form-group">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="name" placeholder="Juan dela Cruz" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>Phone Number <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="phone" placeholder="+63 917 000 0000" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>Delivery Address <span class="req">*</span></label>
+          <textarea [(ngModel)]="address" placeholder="Street, Barangay, Municipality, Province, ZIP" class="form-input" rows="3"></textarea>
+        </div>
+
+        <h3>Payment Method</h3>
+        <div class="payment-opts">
+          <label class="pay-opt" [class.active]="payment === 'gcash'">
+            <input type="radio" [(ngModel)]="payment" value="gcash" name="payment"> GCash
+          </label>
+          <label class="pay-opt" [class.active]="payment === 'maya'">
+            <input type="radio" [(ngModel)]="payment" value="maya" name="payment"> Maya
+          </label>
+          <label class="pay-opt" [class.active]="payment === 'cod'">
+            <input type="radio" [(ngModel)]="payment" value="cod" name="payment"> Cash on Delivery
+          </label>
+          <label class="pay-opt" [class.active]="payment === 'visa'">
+            <input type="radio" [(ngModel)]="payment" value="visa" name="payment"> Visa / Card
+          </label>
+        </div>
+      </div>
+
+      <!-- RIGHT: Order summary -->
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-items">
+          <div class="summary-item" *ngFor="let item of cart.items()">
+            <img [src]="item.imageUrl || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=60'"
+                 class="s-img" [alt]="item.name">
+            <div class="s-info">
+              <p class="s-name">{{ item.name }}</p>
+              <p class="s-farm">{{ item.farmName }}</p>
+              <p class="s-detail">{{ item.qty }} {{ item.unit }} × ₱{{ item.price }}</p>
+            </div>
+            <span class="s-price">₱{{ (item.price * item.qty).toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <div class="summary-totals">
+          <div class="t-row"><span>Subtotal</span><span>₱{{ subtotal.toFixed(2) }}</span></div>
+          <div class="t-row"><span>Platform fee (2%)</span><span>₱{{ fee.toFixed(2) }}</span></div>
+          <div class="t-row grand"><span>Total</span><span>₱{{ grand.toFixed(2) }}</span></div>
+        </div>
+
+        <button class="btn-place-order" (click)="placeOrder()"
+                [disabled]="loading || !address.trim()">
+          {{ loading ? 'Processing...' : 'Place Order' }}
+        </button>
+
+        <a routerLink="/cart" class="btn-back-cart">← Edit Cart</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

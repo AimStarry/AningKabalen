@@ -1,0 +1,19 @@
+.footer { font-family: 'DM Sans', sans-serif; background: #f5f0dc; margin-top: 60px; }
+.footer-top { display: flex; align-items: center; gap: 24px; padding: 12px 40px; background: #e8dfa8; font-size: .78rem; font-weight: 600; color: #4b5563; flex-wrap: wrap; }
+.footer-contact { margin-left: auto; display: flex; gap: 20px; font-weight: 400; }
+.footer-main { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; padding: 40px 40px 32px; max-width: 1200px; margin: 0 auto; }
+.brand-logo { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: #1a2818; margin-bottom: 12px; }
+.footer-brand p { font-size: .82rem; color: #6b7280; line-height: 1.6; margin-bottom: 14px; }
+.socials { display: flex; gap: 8px; }
+.socials span { width: 28px; height: 28px; background: #d1c97e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .2s; }
+.socials span:hover { background: #16a34a; color: #fff; }
+.footer-col h4 { font-size: .9rem; font-weight: 700; color: #1a2818; margin-bottom: 12px; }
+.footer-col a, .footer-col p { display: block; font-size: .82rem; color: #6b7280; text-decoration: none; line-height: 1.8; transition: color .2s; }
+.footer-col a:hover { color: #16a34a; }
+.footer-bottom { border-top: 1px solid #e2d96a; padding: 14px 40px; display: flex; justify-content: space-between; font-size: .75rem; color: #9ca3af; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 768px) {
+  .footer-main { grid-template-columns: 1fr 1fr; gap: 24px; padding: 24px; }
+  .footer-top { padding: 12px 24px; }
+  .footer-contact { margin-left: 0; }
+  .footer-bottom { padding: 12px 24px; flex-direction: column; }
+}

@@ -1,0 +1,77 @@
+<app-navbar></app-navbar>
+
+<div class="cart-page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Shopping Cart</h1>
+      <p class="item-count" *ngIf="cart.items().length > 0">{{ cart.count() }} item(s) in cart</p>
+    </div>
+    <a routerLink="/products" class="btn btn-outline btn-sm">← Continue Shopping</a>
+  </div>
+
+  <!-- EMPTY -->
+  <div class="cart-empty" *ngIf="cart.items().length === 0">
+    <div class="empty-icon-wrap">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray400)" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    </div>
+    <h3>Your cart is empty</h3>
+    <p>Browse our fresh produce and add items to get started.</p>
+    <a routerLink="/products" class="btn-shop">Browse Products</a>
+  </div>
+
+  <!-- CART LAYOUT -->
+  <div class="cart-layout" *ngIf="cart.items().length > 0">
+    <div class="cart-items-card">
+      <div class="cart-items-head">
+        <h3>Cart Items</h3>
+        <button class="btn-clear-all" (click)="clearCart()">Remove All</button>
+      </div>
+      <div class="cart-item" *ngFor="let item of cart.items()">
+        <img [src]="item.imageUrl || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=80'" [alt]="item.name" class="item-img">
+        <div class="item-info">
+          <p class="item-name">{{ item.name }}</p>
+          <p class="item-farm">{{ item.farmName }}</p>
+          <p class="item-price">₱{{ item.price }}/{{ item.unit }}</p>
+        </div>
+        <div class="item-right">
+          <div class="qty-ctrl">
+            <button class="qty-btn" (click)="updateQty(item, item.qty - 1)">−</button>
+            <span class="qty-val">{{ item.qty }}</span>
+            <button class="qty-btn" (click)="updateQty(item, item.qty + 1)">+</button>
+          </div>
+          <span class="item-subtotal">₱{{ (item.price * item.qty).toFixed(2) }}</span>
+          <button class="remove-btn" (click)="remove(item)" title="Remove">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h8M4 5h12l-1 12H5L4 5z"/><path d="M8 8v6M12 8v6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="cart-summary">
+      <h3 class="summary-title">Order Summary</h3>
+      <div class="summary-row"><span>Subtotal ({{ cart.count() }} items)</span><span>₱{{ cart.total().toFixed(2) }}</span></div>
+      <div class="summary-row"><span>Platform fee (2%)</span><span>₱{{ (cart.total() * 0.02).toFixed(2) }}</span></div>
+      <div class="summary-row total"><span>Total</span><span>₱{{ (cart.total() * 1.02).toFixed(2) }}</span></div>
+
+      <div class="action-buttons">
+        <a routerLink="/checkout" class="btn-direct-order">
+          🛒 Place Order Now
+        </a>
+        <a routerLink="/reservation" class="btn-reserve-from-cart">
+          📋 Reserve Instead
+        </a>
+      </div>
+      <p class="action-note">
+        <strong>Order</strong> = Buy from stock immediately<br>
+        <strong>Reserve</strong> = Pre-book, farmer confirms in 48h
+      </p>
+      <div class="secure-note">
+        <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 1l7 3v6c0 4-3 7-7 8C3 17 0 14 0 10V4l10-3z"/></svg>
+        Secure · Verified Farmers · 2% fee only
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

@@ -1,0 +1,85 @@
+<app-navbar></app-navbar>
+
+<div class="products-page">
+  <!-- SIDEBAR FILTERS -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <h4>Categories</h4>
+      <button class="filter-btn" [class.active]="selectedCategory===''" (click)="selectedCategory='';onFilterChange()">
+        All Categories <span class="filter-count">{{ allListings.length }}</span>
+      </button>
+      <button class="filter-btn" *ngFor="let c of categories" [class.active]="selectedCategory===c._id" (click)="selectedCategory=c._id;onFilterChange()">
+        {{ c.name }} <span class="filter-count">{{ getCountByCategory(c._id) }}</span>
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <h4>Farms</h4>
+      <button class="farm-option" [class.active]="selectedFarm===''" (click)="selectedFarm='';onFilterChange()">
+        <div class="farm-dot"></div> All Farms
+      </button>
+      <button class="farm-option" *ngFor="let f of farms" [class.active]="selectedFarm===f._id" (click)="selectedFarm=f._id;onFilterChange()">
+        <div class="farm-dot"></div> {{ f.farm_name }}
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="products-main">
+    <!-- MOSAIC HERO -->
+    <div class="mosaic-section" *ngIf="!selectedCategory && !searchTerm">
+      <p class="mosaic-title">Shop by Mood</p>
+      <div class="mosaic-grid">
+        <div class="mosaic-card" *ngFor="let m of mosaicCategories" (click)="selectCategory(m.key)">
+          <img [src]="m.imageUrl" [alt]="m.label" loading="lazy">
+          <div class="mosaic-overlay"><span class="mosaic-label">{{ m.label }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-search">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="var(--gray400)" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/></svg>
+        <input type="text" placeholder="Search crops..." [(ngModel)]="searchTerm" (input)="onFilterChange()">
+      </div>
+      <span class="results-count" *ngIf="!loading">{{ totalVisible }} products found</span>
+      <div class="loading-row" *ngIf="loading">Loading...</div>
+    </div>
+
+    <!-- CATEGORY ROWS -->
+    <ng-container *ngFor="let cat of visibleCategories">
+      <div class="cat-section">
+        <div class="cat-row-head">
+          <h3 class="cat-row-title">{{ cat }}</h3>
+          <span class="results-count">{{ getProductsByCategory(cat).length }} items</span>
+        </div>
+        <div class="cat-row-scroll-wrap">
+          <button class="scroll-btn left" (click)="scrollRow(cat,'left')">‹</button>
+          <div class="cat-row" [id]="'row-'+safeId(cat)">
+            <a class="product-card" *ngFor="let p of getProductsByCategory(cat)" [routerLink]="['/crop', p._id]">
+              <div class="card-img-wrap">
+                <img [src]="getImage(p)" [alt]="p.crop_name" class="card-img" loading="lazy">
+              </div>
+              <div class="card-body">
+                <p class="card-cat">{{ getCatName(p) }}</p>
+                <h4 class="card-name">{{ p.crop_name }}</h4>
+                <p class="card-farm">{{ getFarmName(p) }}</p>
+                <div class="card-footer">
+                  <span class="card-price">₱{{ p.price_per_kg }}/{{ p.unit }}</span>
+                  <button class="btn-add" (click)="addToCart(p,$event)">+ Add</button>
+                </div>
+              </div>
+            </a>
+          </div>
+          <button class="scroll-btn right" (click)="scrollRow(cat,'right')">›</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="empty-section" *ngIf="!loading && isEmpty">
+      No products found. Try a different search or category.
+    </div>
+  </main>
+</div>
+
+<app-footer></app-footer>

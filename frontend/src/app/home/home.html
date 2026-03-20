@@ -1,0 +1,152 @@
+<app-navbar></app-navbar>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <span class="hero-badge">🌱 Farm-to-Buyer Marketplace</span>
+    <h1>Fresh from the Farm,<br><em>Direct to You</em></h1>
+    <p>Buy fresh produce straight from verified Filipino farmers. No middlemen. Honest prices. Guaranteed freshness.</p>
+    <div class="hero-cta">
+      <a routerLink="/products" class="btn-hero btn-hero-primary">Shop Now →</a>
+      <a routerLink="/reservation" class="btn-hero btn-hero-ghost">📋 Reserve Crops</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-item"><span class="trust-icon">🌾</span><div><div class="trust-num">500+</div><span>Partner Farmers</span></div></div>
+  <div class="trust-item"><span class="trust-icon">🛒</span><div><div class="trust-num">2,000+</div><span>Happy Buyers</span></div></div>
+  <div class="trust-item"><span class="trust-icon">🌿</span><div><div class="trust-num">50+</div><span>Crop Varieties</span></div></div>
+  <div class="trust-item"><span class="trust-icon">⚡</span><div><div class="trust-num">48h</div><span>Reservation Response</span></div></div>
+</div>
+
+<!-- CATEGORIES -->
+<section class="cat-section">
+  <div class="sec-head">
+    <div>
+      <p class="eyebrow">Browse by Category</p>
+      <h2 class="section-title">What are you looking for?</h2>
+    </div>
+    <a routerLink="/view-all" class="view-all-btn">View All Listings →</a>
+  </div>
+  <div class="cat-grid">
+    <a *ngFor="let cat of categoryLinks" class="cat-card" [routerLink]="['/products']" [queryParams]="{category: cat.slug}">
+      <div class="cat-img-wrap"><img [src]="cat.imageUrl" [alt]="cat.label" loading="lazy"></div>
+      <span class="cat-label">{{ cat.label }}</span>
+    </a>
+  </div>
+</section>
+
+<!-- PROMO BANNERS -->
+<section class="promo-section">
+  <div class="promo-grid">
+    <div class="promo-card promo-green">
+      <div class="promo-text">
+        <h3>Fruits &amp; Vegetables</h3>
+        <p>Pesticide-free, farm-fresh produce</p>
+        <a routerLink="/products" [queryParams]="{category:'vegetables'}" class="btn-promo">Shop Now →</a>
+      </div>
+      <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=320&q=80" alt="Fruits Vegetables" class="promo-img">
+    </div>
+    <div class="promo-card promo-amber">
+      <div class="promo-text">
+        <h3>Grains &amp; Cereals</h3>
+        <p>Straight from Philippine rice fields</p>
+        <a routerLink="/products" [queryParams]="{category:'grains'}" class="btn-promo">Shop Now →</a>
+      </div>
+      <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=320&q=80" alt="Grains" class="promo-img">
+    </div>
+  </div>
+</section>
+
+<!-- POPULAR PRODUCTS -->
+<section class="prod-section">
+  <div class="sec-head">
+    <div>
+      <p class="eyebrow">Trending Now</p>
+      <h2 class="section-title">Popular Products</h2>
+    </div>
+    <a routerLink="/view-all" class="view-all-btn">See All →</a>
+  </div>
+  <div class="loading-wrap" *ngIf="loading"><div class="spinner"></div></div>
+  <div class="product-grid" *ngIf="!loading">
+    <a class="product-card" *ngFor="let p of popularProducts" [routerLink]="['/crop', p._id]">
+      <div class="card-img-wrap">
+        <img [src]="getImage(p)" [alt]="p.crop_name" class="card-img" loading="lazy">
+      </div>
+      <div class="card-body">
+        <p class="card-cat">{{ getCatName(p) }}</p>
+        <h4 class="card-name">{{ p.crop_name }}</h4>
+        <p class="card-farm">{{ getFarmName(p) }}</p>
+        <div class="card-footer">
+          <span class="card-price">₱{{ p.price_per_kg }}/{{ p.unit }}</span>
+          <button class="btn-add-card" (click)="addToCart(p, $event)">+ Add</button>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- BEST SELLS -->
+<section class="prod-section prod-section-white">
+  <div class="sec-head">
+    <div>
+      <p class="eyebrow">Daily Picks</p>
+      <h2 class="section-title">Best Sellers</h2>
+    </div>
+  </div>
+  <div class="best-grid" *ngIf="!loading">
+    <div class="best-feature">
+      <span class="best-badge">FARM FRESH</span>
+      <p class="best-title">Grown with Love</p>
+      <p class="best-sub">Natural · Organic</p>
+      <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&q=80" alt="Farm Fresh" class="best-img">
+    </div>
+    <div class="best-products">
+      <a class="product-card" *ngFor="let p of bestSells" [routerLink]="['/crop', p._id]">
+        <div class="card-img-wrap">
+          <img [src]="getImage(p)" [alt]="p.crop_name" class="card-img" loading="lazy">
+        </div>
+        <div class="card-body">
+          <p class="card-cat">{{ getCatName(p) }}</p>
+          <h4 class="card-name">{{ p.crop_name }}</h4>
+          <div class="card-footer">
+            <span class="card-price">₱{{ p.price_per_kg }}/{{ p.unit }}</span>
+            <button class="btn-add-outline" (click)="addToCart(p, $event)">+ Cart</button>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FARM STRIP -->
+<div class="farm-strip">
+  <div class="farm-photo" *ngFor="let photo of farmPhotos">
+    <img [src]="photo" alt="Farm photo" loading="lazy">
+  </div>
+</div>
+
+<!-- CTA SECTION -->
+<section class="cta-section">
+  <div class="cta-img">
+    <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=700&q=80" alt="Filipino farmer">
+    <div class="cta-img-badge">
+      <strong>₱0 commission</strong>
+      Farmers keep 98% of revenue
+    </div>
+  </div>
+  <div class="cta-text">
+    <div class="cta-eyebrow"><span class="eyebrow-dot"></span> What We Do</div>
+    <h2>Empowering Filipino Farmers Through Technology</h2>
+    <p>AningKabalen removes the middlemen and connects farmers directly with buyers. Reserve upcoming harvests or buy from available stock — all in one platform.</p>
+    <div class="cta-stats">
+      <div class="cta-stat"><div class="cta-stat-num">2%<span></span></div><p>Platform fee<br>only</p></div>
+      <div class="cta-stat"><div class="cta-stat-num">48<span>h</span></div><p>Reservation<br>response</p></div>
+      <div class="cta-stat"><div class="cta-stat-num">100<span>%</span></div><p>Verified<br>farmers</p></div>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

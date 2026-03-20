@@ -1,0 +1,185 @@
+<app-farmer-navbar></app-farmer-navbar>
+
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" *ngIf="modalOpen" @overlayFade (click)="closeModal()"></div>
+
+<div class="page-wrap" @fadeInUp>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar-row">
+    <div class="toolbar-left">
+      <h1 class="page-title">My Listings</h1>
+      <span class="listing-count" *ngIf="!listLoading">{{ listings.length }} crops</span>
+    </div>
+    <div class="toolbar-right">
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="var(--gray400)" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/></svg>
+        <input type="text" placeholder="Search crop..." [(ngModel)]="searchTerm" class="search-input">
+      </div>
+      <button class="btn-add-listing" (click)="openModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Product
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-msg" *ngIf="listLoading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card" *ngIf="!listLoading">
+    <div class="table-empty" *ngIf="filteredListings.length === 0">
+      <span>🌾</span>
+      <p>{{ searchTerm ? 'No crops match your search.' : 'No listings yet. Add your first crop!' }}</p>
+      <button class="btn-add-listing" (click)="openModal()" *ngIf="!searchTerm">+ Add First Listing</button>
+    </div>
+    <table class="data-table" *ngIf="filteredListings.length > 0">
+      <thead>
+        <tr>
+          <th>Image</th><th>Crop</th><th>Category</th>
+          <th>Qty (kg)</th><th>Available</th><th>Price/unit</th>
+          <th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let listing of filteredListings" @tableRow>
+          <td>
+            <img *ngIf="listing.images[0]" [src]="listing.images[0]" class="crop-thumb" [alt]="listing.crop_name">
+            <div *ngIf="!listing.images[0]" class="crop-thumb-placeholder">🌾</div>
+          </td>
+          <td>
+            <p class="td-bold">{{ listing.crop_name }}</p>
+            <p class="td-sub" *ngIf="listing.variety">{{ listing.variety }}</p>
+          </td>
+          <td>{{ getCategoryName(listing) }}</td>
+          <td>{{ listing.quantity_kg }}</td>
+          <td>
+            <span [class]="listing.available_kg > 0 ? 'td-avail' : 'td-sold'">
+              {{ listing.available_kg }} {{ listing.unit }}
+            </span>
+          </td>
+          <td class="td-price">₱{{ listing.price_per_kg }}/{{ listing.unit }}</td>
+          <td><span class="pill" [ngClass]="statusClass(listing.status)">{{ listing.status | titlecase }}</span></td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-edit" (click)="openModal(listing)" title="Edit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="btn-delete" (click)="deleteListing(listing._id, listing.crop_name)" title="Delete">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-panel" *ngIf="modalOpen" @slideInRight>
+  <div class="modal-header">
+    <h2>{{ editingId ? 'Edit Listing' : 'Add New Listing' }}</h2>
+    <button class="modal-close" (click)="closeModal()">✕</button>
+  </div>
+
+  <form [formGroup]="listingForm" (ngSubmit)="onSubmit()" class="modal-form">
+    <!-- IMAGE UPLOAD -->
+    <div class="upload-zone" [class.dragover]="dragOver"
+         (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
+      <img *ngIf="previewUrl" [src]="previewUrl" class="upload-preview" alt="Preview">
+      <div class="upload-prompt" *ngIf="!previewUrl">
+        <div class="upload-icon">📷</div>
+        <p>Drag & drop or <label class="upload-link"><input type="file" accept="image/*" (change)="onFileChange($event)" hidden>click to upload</label></p>
+        <span>JPG, PNG up to 10MB</span>
+      </div>
+      <div class="upload-change" *ngIf="previewUrl">
+        <label class="upload-link"><input type="file" accept="image/*" (change)="onFileChange($event)" hidden>Change Image</label>
+        <button type="button" class="upload-remove" (click)="previewUrl=null; selectedFile=null">Remove</button>
+      </div>
+    </div>
+
+    <!-- FIELDS -->
+    <div class="form-row-2">
+      <div class="form-group" [class.field-error]="hasError('categoryId')">
+        <label class="form-label">Category <span class="req">*</span></label>
+        <select formControlName="categoryId" class="form-input">
+          <option value="">Select category</option>
+          <option *ngFor="let cat of categories" [value]="cat._id">{{ cat.name }}</option>
+        </select>
+      </div>
+      <div class="form-group" [class.field-error]="hasError('unit')">
+        <label class="form-label">Unit <span class="req">*</span></label>
+        <select formControlName="unit" class="form-input">
+          <option value="kg">kg</option>
+          <option value="g">grams</option>
+          <option value="dozen">dozen</option>
+          <option value="piece">piece</option>
+          <option value="bundle">bundle</option>
+          <option value="sack">sack</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group" [class.field-error]="hasError('cropName')">
+      <label class="form-label">Crop Name <span class="req">*</span></label>
+      <input formControlName="cropName" type="text" placeholder="e.g. Cabbage" class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Variety / Type</label>
+      <input formControlName="variety" type="text" placeholder="e.g. Green, Carabao, Roma" class="form-input">
+    </div>
+
+    <div class="form-row-3">
+      <div class="form-group" [class.field-error]="hasError('quantity')">
+        <label class="form-label">Qty (count) <span class="req">*</span></label>
+        <input formControlName="quantity" type="number" placeholder="100" class="form-input" min="1">
+      </div>
+      <div class="form-group" [class.field-error]="hasError('quantityKg')">
+        <label class="form-label">Total Qty (kg) <span class="req">*</span></label>
+        <input formControlName="quantityKg" type="number" placeholder="100" class="form-input" min="0.1" step="0.1">
+      </div>
+      <div class="form-group" [class.field-error]="hasError('availableKg')">
+        <label class="form-label">Available (kg) <span class="req">*</span></label>
+        <input formControlName="availableKg" type="number" placeholder="80" class="form-input" min="0" step="0.1">
+      </div>
+    </div>
+
+    <div class="form-row-2">
+      <div class="form-group" [class.field-error]="hasError('price')">
+        <label class="form-label">Price per unit (₱) <span class="req">*</span></label>
+        <input formControlName="price" type="number" placeholder="45.00" class="form-input" min="0.01" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select formControlName="status" class="form-input">
+          <option value="available">Available</option>
+          <option value="reserved">Reserved</option>
+          <option value="sold_out">Sold Out</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group" [class.field-error]="hasError('description')">
+      <label class="form-label">Description <span class="req">*</span></label>
+      <textarea formControlName="description" rows="3" class="form-input"
+                placeholder="Describe your crop — freshness, growing methods, certifications..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Tags (comma-separated)</label>
+      <input formControlName="tags" type="text" placeholder="organic, highland, pesticide-free" class="form-input">
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-outline" (click)="closeModal()">Cancel</button>
+      <button type="submit" class="btn btn-green" [disabled]="loading">
+        {{ loading ? 'Saving...' : (editingId ? 'Update Listing' : 'Create Listing') }}
+      </button>
+    </div>
+  </form>
+</div>

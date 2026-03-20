@@ -1,0 +1,173 @@
+<div class="layout">
+  <app-sidebar role="admin" ></app-sidebar>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" (click)="sidebarOpen = !sidebarOpen">☰</button>
+        <div class="search-box">
+          <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="#9ca3af" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/></svg>
+          <input type="text" placeholder="Search...">
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+        <div class="user-chip">
+          <div class="avatar">{{ auth.currentUser()?.name?.charAt(0) ?? "A" }}</div>
+          <div class="user-info"><p class="u-name">{{ auth.currentUser()?.name ?? "Admin" }}</p><p class="u-role">Super Admin</p></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-content" @fadeInUp>
+      <div class="greeting">
+        <h2 class="f-display">Hello, <span class="highlight">{{ auth.currentUser()?.name?.split(" ")?.[0] ?? "Admin" }}</span> 👋</h2>
+        <p>Platform overview for today, {{ today }}.</p>
+      </div>
+
+      <!-- STAT CARDS -->
+      <section class="stats-row" @staggerCards>
+        <div class="stat-card card-amber">
+          <div class="stat-icon">👥</div>
+          <div class="stat-body"><p class="stat-label">Registered Users</p><p class="stat-value">{{ stats.registeredUsers | number }}</p><p class="stat-sub">All accounts</p></div>
+          <div class="stat-bar amber"></div>
+        </div>
+        <div class="stat-card card-green">
+          <div class="stat-icon">🌾</div>
+          <div class="stat-body"><p class="stat-label">Active Listings</p><p class="stat-value">{{ stats.currentListings | number }}</p><p class="stat-sub">of {{ stats.totalListings }} total</p></div>
+          <div class="stat-bar green"></div>
+        </div>
+        <div class="stat-card card-teal">
+          <div class="stat-icon">💰</div>
+          <div class="stat-body"><p class="stat-label">Total Transactions</p><p class="stat-value">{{ stats.totalTransactions | number }}</p></div>
+          <div class="stat-bar teal"></div>
+        </div>
+        <div class="stat-card card-orange">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-body"><p class="stat-label">Pending</p><p class="stat-value">{{ stats.reservationsPending | number }}</p></div>
+          <div class="stat-bar orange"></div>
+        </div>
+      </section>
+
+      <!-- USER VERIFICATION -->
+      <section class="table-section" @fadeInUp>
+        <div class="section-head">
+          <div><h3 class="f-display">User Verification</h3><p class="section-sub">Farmer account approvals</p></div>
+          <button class="btn-outline">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Farm Name</th><th>Location</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let user of verifications" @tableRow [class.editing-row]="user.editing">
+                <td><div class="user-cell"><div class="mini-avatar">{{ user.name.charAt(0) }}</div><span class="bold">{{ user.name }}</span></div></td>
+                <td>{{ user.farmName }}</td>
+                <td>{{ user.location }}</td>
+                <td class="date">{{ user.submittedAt }}</td>
+                <td>
+                  <span class="pill" [ngClass]="getStatusClass(user.status)" *ngIf="!user.editing">{{ user.status | titlecase }}</span>
+                  <select class="status-select" [(ngModel)]="user.pendingStatus" *ngIf="user.editing">
+                    <option *ngFor="let s of verificationStatuses" [value]="s">{{ s | titlecase }}</option>
+                  </select>
+                </td>
+                <td>
+                  <div class="action-group" *ngIf="!user.editing">
+                    <button class="verify-btn" [class.verified]="user.status === 'verified'" [disabled]="user.status === 'verified'" (click)="verifyUser(user.id)">
+                      {{ user.status === 'verified' ? '✓ Verified' : user.status === 'flagged' ? '⚠ Review' : 'Verify' }}
+                    </button>
+                    <button class="edit-status-btn" (click)="startEditUser(user)">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M13.586 3.586a2 2 0 112.828 2.828l-8.793 8.793-3.621.793.793-3.621 8.793-8.793z"/></svg>
+                    </button>
+                  </div>
+                  <div class="action-group" *ngIf="user.editing">
+                    <button class="confirm-btn" (click)="confirmEditUser(user)">✓ Save</button>
+                    <button class="discard-btn" (click)="cancelEditUser(user)">✕</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- CURRENT LISTINGS -->
+      <section class="table-section" @fadeInUp>
+        <div class="section-head">
+          <div><h3 class="f-display">Current Listings</h3><p class="section-sub">Active crop listings</p></div>
+          <button class="btn-outline">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Farmer</th><th>Crop</th><th>Qty Kg</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let listing of listings" @tableRow [class.editing-row]="listing.editing">
+                <td class="bold">{{ listing.farmerName }}</td>
+                <td>{{ listing.cropName }}</td>
+                <td>{{ listing.quantity_kg }} kg</td>
+                <td>₱{{ listing.price_per_kg }}</td>
+                <td>
+                  <span class="pill" [ngClass]="getStatusClass(listing.status)" *ngIf="!listing.editing">{{ listing.status | titlecase }}</span>
+                  <select class="status-select" [(ngModel)]="listing.pendingStatus" *ngIf="listing.editing">
+                    <option *ngFor="let s of listingStatuses" [value]="s">{{ s | titlecase }}</option>
+                  </select>
+                </td>
+                <td>
+                  <div class="action-group" *ngIf="!listing.editing">
+                    <button class="edit-status-btn" (click)="startEditListing(listing)">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M13.586 3.586a2 2 0 112.828 2.828l-8.793 8.793-3.621.793.793-3.621 8.793-8.793z"/></svg>
+                      Edit Status
+                    </button>
+                  </div>
+                  <div class="action-group" *ngIf="listing.editing">
+                    <button class="confirm-btn" (click)="confirmEditListing(listing)">✓ Save</button>
+                    <button class="discard-btn" (click)="cancelEditListing(listing)">✕</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section class="table-section" @fadeInUp>
+        <div class="section-head">
+          <div><h3 class="f-display">Transactions</h3><p class="section-sub">Recent activity</p></div>
+          <button class="btn-outline">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Farmer</th><th>Crop</th><th>Qty Kg</th><th>Buyer</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let txn of transactions" @tableRow [class.editing-row]="txn.editing">
+                <td class="bold">{{ txn.farmerName }}</td>
+                <td>{{ txn.cropName }}</td>
+                <td>{{ txn.qtyKg }} kg</td>
+                <td>{{ txn.buyerName }}</td>
+                <td>₱{{ txn.total_amount | number:'1.2-2' }}</td>
+                <td>
+                  <span class="pill" [ngClass]="getStatusClass(txn.status)" *ngIf="!txn.editing">{{ txn.status | titlecase }}</span>
+                  <select class="status-select" [(ngModel)]="txn.pendingStatus" *ngIf="txn.editing">
+                    <option *ngFor="let s of transactionStatuses" [value]="s">{{ s | titlecase }}</option>
+                  </select>
+                </td>
+                <td>
+                  <div class="action-group" *ngIf="!txn.editing">
+                    <button class="edit-status-btn" (click)="startEditTxn(txn)">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M13.586 3.586a2 2 0 112.828 2.828l-8.793 8.793-3.621.793.793-3.621 8.793-8.793z"/></svg>
+                      Edit Status
+                    </button>
+                  </div>
+                  <div class="action-group" *ngIf="txn.editing">
+                    <button class="confirm-btn" (click)="confirmEditTxn(txn)">✓ Save</button>
+                    <button class="discard-btn" (click)="cancelEditTxn(txn)">✕</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

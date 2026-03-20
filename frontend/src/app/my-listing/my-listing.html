@@ -1,0 +1,63 @@
+<app-farmer-navbar></app-farmer-navbar>
+
+<div class="page-wrap" @fadeUp>
+  <div class="toolbar-row">
+    <div class="toolbar-left">
+      <h1 class="page-title">My Listings</h1>
+      <span class="count-badge" *ngIf="!loading">{{ filtered.length }} crops</span>
+    </div>
+    <div class="toolbar-right">
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="var(--gray400)" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/></svg>
+        <input type="text" placeholder="Search crop..." [(ngModel)]="searchTerm" class="search-input">
+      </div>
+      <a routerLink="/farmer/listings" class="btn-add-link">+ Add New</a>
+    </div>
+  </div>
+
+  <div class="loading-wrap" *ngIf="loading"><div class="spinner"></div></div>
+
+  <div class="table-card" *ngIf="!loading">
+    <div class="table-empty" *ngIf="filtered.length === 0">
+      <span class="empty-icon">🌾</span>
+      <p class="empty-title">{{ searchTerm ? 'No crops match your search.' : 'No listings yet.' }}</p>
+      <a routerLink="/farmer/listings" class="btn btn-green btn-sm" *ngIf="!searchTerm">Add Your First Crop</a>
+    </div>
+    <table class="data-table" *ngIf="filtered.length > 0">
+      <thead>
+        <tr>
+          <th></th><th>Crop</th><th>Category</th>
+          <th>Qty (kg)</th><th>Available</th><th>Price</th>
+          <th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let l of filtered" @tableRow>
+          <td>
+            <img *ngIf="getImage(l)" [src]="getImage(l)" class="crop-thumb" [alt]="l.crop_name">
+            <div class="crop-no-img" *ngIf="!getImage(l)">🌾</div>
+          </td>
+          <td>
+            <p class="td-name">{{ l.crop_name }}</p>
+            <p class="td-variety" *ngIf="l.variety">{{ l.variety }}</p>
+          </td>
+          <td>{{ getCategoryName(l) }}</td>
+          <td>{{ l.quantity_kg }} {{ l.unit }}</td>
+          <td>
+            <span class="avail-tag" [class.low]="l.available_kg <= 10">
+              {{ l.available_kg }} {{ l.unit }}
+            </span>
+          </td>
+          <td class="td-price">₱{{ l.price_per_kg }}/{{ l.unit }}</td>
+          <td><span class="pill" [ngClass]="getStatusClass(l.status)">{{ l.status | titlecase }}</span></td>
+          <td>
+            <div class="action-btns">
+              <a [routerLink]="['/farmer/listings']" [queryParams]="{edit: l._id}" class="btn-action edit" title="Edit">✏</a>
+              <button class="btn-action delete" (click)="deleteListing(l._id)" title="Delete">🗑</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

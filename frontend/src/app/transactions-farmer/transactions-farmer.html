@@ -1,0 +1,131 @@
+<app-farmer-navbar></app-farmer-navbar>
+
+<div class="page-wrap" @fadeUp>
+
+  <!-- SEARCH + TABS -->
+  <div class="toolbar">
+    <div class="search-card">
+      <div class="search-inner">
+        <input type="text" placeholder="Search by buyer or crop..." [(ngModel)]="searchTerm" class="search-input">
+        <svg viewBox="0 0 20 20" fill="none" stroke="#9ca3af" stroke-width="1.8" width="18" height="18"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn" [class.active]="activeTab === 'reservations'" (click)="activeTab = 'reservations'">
+      📋 Reservations
+      <span class="tab-badge pending" *ngIf="pendingReservations > 0">{{ pendingReservations }} pending</span>
+      <span class="tab-count" *ngIf="pendingReservations === 0">{{ reservations.length }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'orders'" (click)="activeTab = 'orders'">
+      🛒 Direct Orders
+      <span class="tab-badge" *ngIf="pendingOrders > 0">{{ pendingOrders }} to fulfill</span>
+      <span class="tab-count" *ngIf="pendingOrders === 0">{{ orders.length }}</span>
+    </button>
+  </div>
+
+  <div class="loading-msg" *ngIf="loading">Loading...</div>
+
+  <!-- ─── RESERVATIONS TAB ─────────────────────── -->
+  <div class="content" *ngIf="!loading && activeTab === 'reservations'">
+    <div class="tab-note">
+      Buyers pre-book your crops. <strong>You must confirm or decline</strong> within 48 hours.
+    </div>
+    <div class="empty-state" *ngIf="filteredReservations.length === 0">
+      <p>📋 No reservations yet.</p>
+    </div>
+    <div class="txn-item" *ngFor="let r of filteredReservations">
+      <div class="txn-summary" (click)="toggle(r)">
+        <div class="toggle-btn">
+          <svg *ngIf="!r.expanded" viewBox="0 0 20 20" fill="none" stroke="#16a34a" stroke-width="2" width="14" height="14"><path d="M5 8l5 5 5-5"/></svg>
+          <svg *ngIf="r.expanded"  viewBox="0 0 20 20" fill="none" stroke="#16a34a" stroke-width="2" width="14" height="14"><path d="M5 12l5-5 5 5"/></svg>
+        </div>
+        <div class="buyer-avatar">{{ getBuyerName(r).charAt(0) }}</div>
+        <div class="txn-main">
+          <p class="txn-buyer">{{ getBuyerName(r) }}</p>
+          <p class="txn-crop">{{ getCropName(r) }} · {{ r.quantity_kg }} kg</p>
+        </div>
+        <div class="txn-meta">
+          <div class="meta-item"><span class="meta-label">Payment</span><span class="meta-val">{{ r.payment_method }}</span></div>
+          <div class="meta-item"><span class="meta-label">Pickup</span><span class="meta-val">{{ r.pickup_schedule | date:'mediumDate' }}</span></div>
+          <div class="meta-item"><span class="meta-label">Total</span><span class="meta-val bold">₱{{ r.total_amount.toFixed(2) }}</span></div>
+        </div>
+        <span class="pill" [ngClass]="statusClass(r.status)">{{ r.status | titlecase }}</span>
+        <button class="view-btn" (click)="$event.stopPropagation(); toggle(r)">{{ r.expanded ? 'Hide' : 'Details' }}</button>
+      </div>
+      <div class="txn-details" *ngIf="r.expanded" @expandRow>
+        <div class="detail-row">
+          <img [src]="getCropImage(r) || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=60'" class="detail-img" [alt]="getCropName(r)">
+          <div class="detail-info">
+            <p class="detail-crop">{{ getCropName(r) }}</p>
+            <p class="detail-qty">{{ r.quantity_kg }} kg · ₱{{ r.unit_price }}/kg</p>
+            <p class="detail-total">Total: <strong>₱{{ r.total_amount.toFixed(2) }}</strong></p>
+            <p class="detail-date" *ngIf="r.pickup_schedule">Pickup: {{ r.pickup_schedule | date:'fullDate' }}</p>
+            <p class="detail-notes" *ngIf="r.notes">Notes: {{ r.notes }}</p>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn-confirm" (click)="confirmReservation(r)" *ngIf="r.status === 'pending'">
+            ✓ Confirm Reservation
+          </button>
+          <button class="btn-decline" (click)="cancelReservation(r)" *ngIf="r.status === 'pending'">
+            ✕ Decline
+          </button>
+          <span class="confirmed-note" *ngIf="r.status === 'confirmed'">✓ You confirmed this reservation</span>
+          <span class="cancelled-note" *ngIf="r.status === 'cancelled'">This reservation was cancelled</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ORDERS TAB ───────────────────────────── -->
+  <div class="content" *ngIf="!loading && activeTab === 'orders'">
+    <div class="tab-note">
+      Direct purchases from your listings. <strong>Fulfill and mark as completed</strong> when delivered.
+    </div>
+    <div class="empty-state" *ngIf="filteredOrders.length === 0">
+      <p>🛒 No direct orders yet.</p>
+    </div>
+    <div class="txn-item" *ngFor="let t of filteredOrders">
+      <div class="txn-summary" (click)="toggle(t)">
+        <div class="toggle-btn">
+          <svg *ngIf="!t.expanded" viewBox="0 0 20 20" fill="none" stroke="#16a34a" stroke-width="2" width="14" height="14"><path d="M5 8l5 5 5-5"/></svg>
+          <svg *ngIf="t.expanded"  viewBox="0 0 20 20" fill="none" stroke="#16a34a" stroke-width="2" width="14" height="14"><path d="M5 12l5-5 5 5"/></svg>
+        </div>
+        <div class="buyer-avatar">{{ getOrderBuyer(t).charAt(0) }}</div>
+        <div class="txn-main">
+          <p class="txn-buyer">{{ getOrderBuyer(t) }}</p>
+          <p class="txn-crop">{{ getOrderCrop(t) }} · {{ t.quantity_kg }} kg</p>
+        </div>
+        <div class="txn-meta">
+          <div class="meta-item"><span class="meta-label">Payment</span><span class="meta-val">{{ t.payment_method }}</span></div>
+          <div class="meta-item"><span class="meta-label">Date</span><span class="meta-val">{{ t.created_at | date:'mediumDate' }}</span></div>
+          <div class="meta-item"><span class="meta-label">Total</span><span class="meta-val bold">₱{{ t.total_amount.toFixed(2) }}</span></div>
+        </div>
+        <span class="pill" [ngClass]="statusClass(t.status)">{{ t.status | titlecase }}</span>
+        <button class="view-btn" (click)="$event.stopPropagation(); toggle(t)">{{ t.expanded ? 'Hide' : 'Details' }}</button>
+      </div>
+      <div class="txn-details" *ngIf="t.expanded" @expandRow>
+        <div class="detail-row">
+          <img [src]="getOrderImage(t) || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=60'" class="detail-img" [alt]="getOrderCrop(t)">
+          <div class="detail-info">
+            <p class="detail-crop">{{ getOrderCrop(t) }}</p>
+            <p class="detail-qty">{{ t.quantity_kg }} kg · ₱{{ t.unit_price }}/kg</p>
+            <p class="detail-total">Subtotal: ₱{{ t.subtotal.toFixed(2) }}</p>
+            <p class="detail-total">Platform fee: ₱{{ t.platform_fee.toFixed(2) }}</p>
+            <p class="detail-total">Total: <strong>₱{{ t.total_amount.toFixed(2) }}</strong></p>
+            <p class="detail-notes" *ngIf="t.notes">Delivery: {{ t.notes }}</p>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn-complete" (click)="markOrderComplete(t)" *ngIf="t.status === 'confirmed'">
+            ✓ Mark as Completed
+          </button>
+          <span class="confirmed-note" *ngIf="t.status === 'completed'">✓ Order completed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

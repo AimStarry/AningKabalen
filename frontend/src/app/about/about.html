@@ -1,0 +1,101 @@
+<app-navbar></app-navbar>
+
+<!-- HERO -->
+<section class="about-hero" @fadeUp>
+  <div class="hero-content">
+    <p class="eyebrow">Our Story</p>
+    <h1>Connecting Filipino<br>Farmers with the World</h1>
+    <p>AningKabalen was built to remove the middlemen that have long reduced farmer income and inflated prices for buyers. We believe the person who grows the food deserves to be paid fairly.</p>
+    <div class="hero-cta">
+      <a routerLink="/products" class="btn btn-green btn-lg">Shop Now</a>
+      <a routerLink="/reservation" class="btn btn-outline btn-lg">Reserve Crops</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-strip">
+  <div class="stat-pill" *ngFor="let s of stats">
+    <span class="stat-num">{{ s.num }}</span>
+    <span class="stat-label">{{ s.label }}</span>
+  </div>
+</div>
+
+<!-- WHO WE ARE -->
+<section class="who-section" @fadeUp>
+  <div class="who-img-wrap">
+    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=85" alt="Filipino farm" class="who-img">
+    <div class="who-badge">
+      <span class="badge-num">100%</span>
+      <span class="badge-label">Farm Fresh</span>
+    </div>
+  </div>
+  <div class="who-text">
+    <p class="eyebrow">Who We Are</p>
+    <h2>Built by Filipinos,<br>for Filipino Farmers</h2>
+    <p>AningKabalen (meaning "fellowman" in Ilocano) was founded to give Filipino farmers a direct digital channel to their customers. We handle the platform, payment tracking, and buyer verification — farmers focus on growing great food.</p>
+    <p>Our reservation system lets buyers pre-book upcoming harvests, guaranteeing income for farmers before the crops even leave the field.</p>
+    <a routerLink="/products" class="btn btn-forest">Explore Products →</a>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" @staggerIn>
+  <div class="how-header">
+    <p class="eyebrow">Simple Process</p>
+    <h2 class="section-title">How AningKabalen Works</h2>
+  </div>
+  <div class="steps-grid">
+    <div class="step" *ngFor="let s of steps">
+      <div class="step-num">{{ s.num }}</div>
+      <div class="step-icon">{{ s.icon }}</div>
+      <h4 class="step-title">{{ s.title }}</h4>
+      <p class="step-desc">{{ s.desc }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section" @fadeUp>
+  <div class="testi-header">
+    <p class="eyebrow">What People Say</p>
+    <h2 class="section-title">Trusted by Farmers &amp; Buyers</h2>
+  </div>
+  <div class="testi-wrap">
+    <div class="testi-card">
+      <div class="stars">
+        <span *ngFor="let i of [1,2,3,4,5]" [class.filled]="i <= testimonials[activeTestimonial].stars">★</span>
+      </div>
+      <p class="testi-quote">{{ testimonials[activeTestimonial].quote }}</p>
+      <div class="testi-author">
+        <img [src]="testimonials[activeTestimonial].avatarUrl" [alt]="testimonials[activeTestimonial].name" class="testi-avatar">
+        <div>
+          <p class="testi-name">{{ testimonials[activeTestimonial].name }}</p>
+          <p class="testi-role">{{ testimonials[activeTestimonial].role }}</p>
+        </div>
+      </div>
+      <div class="testi-controls">
+        <button class="testi-btn" (click)="prev()">‹</button>
+        <div class="testi-dots">
+          <span *ngFor="let t of testimonials; let i = index" class="dot" [class.active]="i === activeTestimonial" (click)="activeTestimonial = i"></span>
+        </div>
+        <button class="testi-btn" (click)="next()">›</button>
+      </div>
+    </div>
+    <div class="testi-img-wrap">
+      <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=500&q=80" alt="Farmer" class="testi-img">
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" @fadeUp>
+  <h2>Ready to experience farm-fresh produce?</h2>
+  <p>Join thousands of buyers getting fresh crops directly from Filipino farmers.</p>
+  <div class="cta-btns">
+    <a routerLink="/login" class="btn btn-green btn-lg">Get Started Free</a>
+    <a routerLink="/products" class="btn btn-outline btn-lg" style="border-color:rgba(255,255,255,.4);color:#fff">Browse Products</a>
+  </div>
+</section>
+
+<app-footer></app-footer>

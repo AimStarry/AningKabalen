@@ -1,0 +1,20 @@
+:host { display: block; font-family: var(--font-sans); background: #f2f0ec; }
+.contact-page { padding: 48px 20px 80px; }
+.contact-wrap { max-width: 660px; margin: 0 auto; }
+.success-banner { background: #d1fae5; border: 1.5px solid #6ee7b7; border-radius: 10px; padding: 14px 20px; color: #065f46; font-weight: 600; font-size: .9rem; margin-bottom: 20px; animation: slideDown .35s ease; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.contact-card { background: #fff; border-radius: 20px; padding: 36px 40px; box-shadow: 0 4px 24px rgba(0,0,0,.07); border: 1px solid var(--gray200); }
+.card-top-rule { height: 3px; background: linear-gradient(90deg, var(--forest), var(--g600), #6ee7b7); border-radius: 3px; margin-bottom: 28px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+.form-group label { font-size: .82rem; font-weight: 600; color: var(--gray700); }
+.form-group input, .form-group textarea { padding: 12px 14px; border: 1.5px solid var(--gray200); border-radius: 10px; font-family: var(--font-sans); font-size: .9rem; outline: none; transition: border-color .2s, box-shadow .2s; resize: vertical; }
+.form-group input:focus, .form-group textarea:focus { border-color: var(--g600); box-shadow: 0 0 0 3px rgba(22,163,74,.1); }
+.form-group.error input, .form-group.error textarea { border-color: #ef4444; }
+.err-msg { font-size: .72rem; color: #ef4444; margin-top: 1px; }
+.form-actions { display: flex; gap: 16px; justify-content: center; margin-top: 8px; }
+.btn-clear { padding: 12px 40px; background: #f87171; color: #fff; border: none; border-radius: 10px; font-family: var(--font-sans); font-size: 1rem; font-weight: 700; cursor: pointer; transition: all .2s; }
+.btn-clear:hover { background: #ef4444; transform: translateY(-1px); }
+.btn-submit { padding: 12px 40px; background: #86efac; color: #14532d; border: none; border-radius: 10px; font-family: var(--font-sans); font-size: 1rem; font-weight: 700; cursor: pointer; transition: all .2s; }
+.btn-submit:hover { background: #4ade80; transform: translateY(-1px); }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .contact-card { padding: 24px 20px; } .form-actions { flex-direction: column; } .btn-clear, .btn-submit { width: 100%; } }

@@ -1,0 +1,46 @@
+.navbar{background:#fff;border-bottom:1px solid var(--gray100);position:sticky;top:0;z-index:200;box-shadow:var(--sh-sm)}
+/* top bar */
+.nav-top{display:flex;align-items:center;gap:16px;padding:13px 5%;border-bottom:1px solid var(--gray100)}
+.brand{font-family:var(--font-display);font-size:1.35rem;font-weight:900;color:var(--forest);letter-spacing:-.5px;flex-shrink:0;display:flex;align-items:center;gap:8px}
+.brand-leaf{font-size:1.1rem}
+.nav-search{flex:1;max-width:480px;display:flex;align-items:center;background:var(--gray100);border-radius:var(--r-full);border:1.5px solid transparent;transition:all var(--dur);overflow:hidden}
+.nav-search:focus-within{background:#fff;border-color:var(--g300);box-shadow:0 0 0 3px rgba(34,197,94,.1)}
+.nav-search input{flex:1;border:none;background:transparent;padding:9px 16px;font-family:var(--font-sans);font-size:.875rem;color:var(--gray900);outline:none}
+.nav-search-btn{padding:9px 14px;color:var(--gray400);cursor:pointer;transition:color var(--dur-fast);flex-shrink:0;display:flex;align-items:center;border:none;background:none}
+.nav-search-btn:hover{color:var(--g600)}
+.nav-right{display:flex;align-items:center;gap:6px;margin-left:auto}
+.nav-btn{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:var(--r-md);color:var(--gray600);font-size:.82rem;font-weight:500;transition:all var(--dur-fast);cursor:pointer;border:none;background:none;white-space:nowrap}
+.nav-btn:hover{background:var(--g50);color:var(--g700)}
+.nav-btn svg{flex-shrink:0}
+.nav-btn.active{background:var(--g50);color:var(--g700)}
+.nav-name{font-weight:700;max-width:100px;overflow:hidden;text-overflow:ellipsis}
+.logout-btn:hover{background:#fef2f2!important;color:var(--red)!important}
+.nav-sep{width:1px;height:18px;background:var(--gray200)}
+.cart-btn{position:relative}
+.cart-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;background:var(--g500);color:#fff;border-radius:var(--r-full);font-size:.62rem;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff;padding:0 3px}
+.nav-login-btn{background:var(--forest);color:#fff!important;border-radius:var(--r-md);padding:8px 16px!important}
+.nav-login-btn:hover{background:var(--g600)!important}
+/* bottom nav */
+.nav-bottom{display:flex;align-items:stretch;padding:0 5%;gap:0;overflow-x:auto;scrollbar-width:none}
+.nav-bottom::-webkit-scrollbar{display:none}
+.dept-wrap{position:relative;flex-shrink:0}
+.dept-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--forest);color:#fff;font-family:var(--font-sans);font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;border:none;transition:background var(--dur-fast);height:100%}
+.dept-btn:hover{background:var(--forest2)}
+.dept-chevron{font-size:.7rem;transition:transform var(--dur);display:inline-block}
+.dept-chevron.open{transform:rotate(180deg)}
+.dept-dropdown{position:absolute;top:100%;left:0;z-index:300;background:#fff;border:1px solid var(--gray200);border-radius:0 var(--r-md) var(--r-md) var(--r-md);box-shadow:var(--sh-lg);min-width:240px;padding:6px}
+.dept-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r-sm);font-size:.875rem;color:var(--gray700);cursor:pointer;transition:all var(--dur-fast)}
+.dept-item:hover{background:var(--g50);color:var(--g700)}
+.dept-item-icon{width:28px;height:28px;border-radius:6px;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.main-nav{display:flex;align-items:center;margin-left:8px}
+.nav-link{padding:10px 14px;font-size:.875rem;font-weight:500;color:var(--gray500);transition:all var(--dur-fast);border-bottom:2.5px solid transparent;white-space:nowrap;display:block}
+.nav-link:hover{color:var(--forest)}
+.nav-link.active{color:var(--forest);border-bottom-color:var(--g500);font-weight:700}
+.nav-end{margin-left:auto;display:flex;align-items:center}
+.nav-help{font-size:.78rem;color:var(--gray400);padding:10px 8px;white-space:nowrap}
+.nav-help:hover{color:var(--g600)}
+/* hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;padding:8px;cursor:pointer;border:none;background:none}
+.hamburger span{display:block;width:20px;height:2px;background:var(--gray700);border-radius:2px;transition:all var(--dur)}
+@media(max-width:900px){.main-nav{display:none}.nav-search{max-width:220px}}
+@media(max-width:640px){.hamburger{display:flex}.nav-search{display:none}.nav-bottom{display:none}.nav-right .nav-btn .nav-name{display:none}}
