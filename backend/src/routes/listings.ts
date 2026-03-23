@@ -13,7 +13,7 @@ router.get('/farmer/:farmerId',     getListingsByFarmer);
 router.get('/:id',                  getListingById);
 router.use(protect);
 router.get('/my/listings',          getMyListings);
-router.post('/',                    requireRole('farmer'), upload.array('images', 5), createListing);
+router.post('/',                    upload.array('images', 5), createListing);
 router.patch('/:id',                requireRole('farmer'), upload.array('images', 5), updateListing);
 router.patch('/:id/status',         requireRole('farmer','admin'), updateListingStatus);
 router.delete('/:id',               requireRole('farmer','admin'), deleteListing);
