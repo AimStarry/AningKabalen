@@ -107,7 +107,7 @@ Navigate to `http://localhost:4200/`. The Angular app will communicate with the 
 |---|---|
 | Marc O. Canlas | UI/UX & Lead Frontend Development |
 | Joemar S. Catipon | Backend & Deployment Logic |
-| Aimee Li Marael S. Pangan | Systems Analysis & DBA |
+| Aimee Li Marael S. Pangan | Systems Analyst & DBA |
 | Tsun Kit Wilson L. Yaochingco | Frontend Developer |
 
 **Course:** Advanced Dynamic Web Development (6AWEB)  
