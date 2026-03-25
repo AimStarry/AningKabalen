@@ -30,7 +30,7 @@ A specialized data model built for the "Culinary Capital of the Philippines." Fa
 | Frontend | Angular (v16+) & RxJS |
 | Backend | Node.js & Express.js |
 | Database | MongoDB (NoSQL) & AWS S3 for storing listing images |
-| Real-time | Socket.io / RxJS-driven API streams |
+| Real-time | RxJS-driven API streams |
 | Styling | CSS |
 
 ---
