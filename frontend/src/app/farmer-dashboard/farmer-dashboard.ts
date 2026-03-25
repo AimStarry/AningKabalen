@@ -5,6 +5,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 import { FarmerNavbarComponent } from '../shared/components/farmer-navbar/farmer-navbar';
 import { ListingService, ApiListing } from '../core/services/listing.service';
 import { TransactionService, ApiTransaction } from '../core/services/transaction.service';
+import { ReservationService, ApiReservation } from '../core/services/reservation.service';
 import { AuthService } from '../core/services/auth.service';
 
 @Component({
@@ -30,23 +31,43 @@ export class FarmerDashboardComponent implements OnInit {
   constructor(
     private listingService:     ListingService,
     private transactionService: TransactionService,
+    private reservationService:  ReservationService,
     public  auth: AuthService
   ) {}
 
   ngOnInit() {
-    this.listingService.getMyListings().subscribe({ next: r => this.crops = r.listings, error: () => {} });
+  this.listingService.getMyListings().subscribe({
+    next: r => this.crops = r.listings,
+    error: () => {}
+  });
 
-    this.transactionService.getMy().subscribe({
-      next: r => {
-        this.transactions = r.transactions;
-        this.stats.totalEarning        = r.transactions.filter(t => t.status === 'completed' || t.status === 'processed').reduce((s, t) => s + t.total_amount, 0);
-        this.stats.pendingReservations = r.transactions.filter(t => t.type === 'reservation' && t.status === 'pending').length;
-        this.stats.pendingOrders       = r.transactions.filter(t => t.type === 'order' && t.status === 'pending').length;
-        this.loading = false;
-      },
-      error: () => { this.loading = false; }
-    });
-  }
+  // ✅ Load reservations for pending count
+  this.reservationService.getMy().subscribe({
+    next: r => {
+      this.stats.pendingReservations = r.reservations.filter(r => r.status === 'pending').length;
+    },
+    error: () => {}
+  });
+
+  this.transactionService.getMy().subscribe({
+    next: r => {
+      this.transactions = r.transactions;
+
+      // ✅ Earnings from completed transactions
+      this.stats.totalEarning = r.transactions
+        .filter(t => t.status === 'completed' || t.status === 'processed')
+        .reduce((s, t) => s + t.total_amount, 0);
+
+      // ✅ Active orders = confirmed direct orders (not reservations)
+      this.stats.pendingOrders = r.transactions
+        .filter(t => t.type === 'order' && t.status === 'confirmed')
+        .length;
+
+      this.loading = false;
+    },
+    error: () => { this.loading = false; }
+  });
+}
 
   getCategoryName(l: ApiListing): string { return (l.category_id as any)?.name ?? ''; }
   getBuyerName(t: ApiTransaction): string { return (t.buyer_id as any)?.name ?? 'Unknown'; }

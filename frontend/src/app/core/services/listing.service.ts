@@ -43,7 +43,7 @@ export class ListingService {
   }
 
   getMyListings(): Observable<{ listings: ApiListing[] }> {
-    return this.http.get<any>(`${this.base}/my/listings`);
+    return this.http.get<any>(`${this.base}/my`);
   }
 
   create(data: FormData): Observable<{ listing: ApiListing }> {

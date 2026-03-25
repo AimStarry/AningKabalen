@@ -4,9 +4,9 @@ const { protect, requireRole } = require('../middleware/auth');
 
 const router = Router();
 router.use(protect);
-router.get('/',                    getMyReservations);
-router.get('/all',   requireRole('admin'), getAllReservations);
-router.post('/',     requireRole('buyer'), createReservation);
-router.get('/:id',                 getReservationById);
-router.patch('/:id/status',        updateReservationStatus);
+router.post('/',              requireRole('buyer'), createReservation);
+router.get('/my',             getMyReservations);
+router.get('/all',            requireRole('admin'), getAllReservations);
+router.get('/:id',            getReservationById);
+router.patch('/:id/status',   updateReservationStatus);
 module.exports = router;

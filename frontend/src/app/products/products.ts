@@ -38,7 +38,7 @@ export class ProductsComponent implements OnInit {
     { key: 'dairy',        label: 'Cheese,\nDairy,\nMilk',   imageUrl: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=300&q=80' },
     { key: 'nuts-grains',  label: 'Nuts &\nBeans',           imageUrl: 'https://images.unsplash.com/photo-1508747703725-719777637510?w=300&q=80' },
     { key: 'grains',       label: 'Grains',                   imageUrl: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&q=80' },
-    { key: 'farm-produce', label: 'Farm\nProduce',            imageUrl: 'https://images.unsplash.com/photo-1621955964441-c173e01c135b?w=300&q=80' },
+    { key: 'farm-produce', label: 'Farm\nProduce',            imageUrl: 'https://cdn.stocksnap.io/img-thumbs/960w/corn-field_J03DR5ED7H.jpg' },
   ];
 
   // Dropdown options derived from loaded categories

@@ -8,5 +8,5 @@ router.get('/stats',  requireRole('admin'), getPlatformStats);
 router.get('/',       requireRole('admin'), getAllTransactions);
 router.get('/my',     getMyTransactions);
 router.get('/:id',    getTransactionById);
-router.patch('/:id/status', requireRole('admin'), updateTransactionStatus);
+router.patch('/:id/status', requireRole('admin', 'farmer'), updateTransactionStatus);
 module.exports = router;
