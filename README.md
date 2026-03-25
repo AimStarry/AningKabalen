@@ -46,7 +46,7 @@ A specialized data model built for the "Culinary Capital of the Philippines." Fa
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/aningkabalen.git
+git clone https://github.com/AimStarry/AningKabalen.git
 cd aningkabalen
 ```
 
