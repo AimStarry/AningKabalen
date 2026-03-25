@@ -1,0 +1,76 @@
+<app-navbar></app-navbar>
+
+<!-- HERO BANNER -->
+<div class="farm-hero" *ngIf="farmer">
+  <nav class="breadcrumb">
+    <a routerLink="/home">Home</a> &rsaquo;
+    <a routerLink="/products">Goods</a> &rsaquo;
+    <span class="crumb-active">{{ farmer.farm_details?.farm_name ?? farmer.name }}</span>
+  </nav>
+  <h1>{{ farmer.farm_details?.farm_name ?? farmer.name }}</h1>
+</div>
+
+<div class="page-body" @fadeUp>
+  <!-- LEFT: category filter sidebar -->
+  <aside class="cat-sidebar">
+    <h4>Categories</h4>
+    <ul class="cat-list">
+      <li [class.active]="selectedCat === ''" (click)="selectedCat = ''">All Products</li>
+      <li *ngFor="let c of categories" [class.active]="selectedCat === c" (click)="selectedCat = c">{{ c }}</li>
+    </ul>
+
+    <div class="farmer-card" *ngIf="farmer">
+      <img [src]="farmer.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80'" class="farmer-avatar" [alt]="farmer.name">
+      <p class="farmer-card-name">{{ farmer.name }}</p>
+      <p class="farmer-card-farm">{{ farmer.farm_details?.farm_name }}</p>
+      <p class="farmer-card-loc">{{ farmer.farm_details?.years_farming }} yrs farming</p>
+      <div class="farmer-rating" *ngIf="farmer.rating?.average > 0">
+        <span>⭐ {{ farmer.rating.average }}</span>
+        <span class="rating-count">({{ farmer.rating.count }} reviews)</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT: product grid -->
+  <section class="product-area">
+    <div class="product-toolbar">
+      <span class="farm-name-head">{{ farmer?.farm_details?.farm_name ?? farmer?.name }}'s Product</span>
+      <div class="toolbar-right">
+        <div class="search-bar">
+          <input type="text" placeholder="Search crop..." [(ngModel)]="searchTerm" class="search-input">
+          <svg viewBox="0 0 20 20" fill="none" stroke="#9ca3af" stroke-width="1.8" width="16" height="16"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/></svg>
+        </div>
+        <div class="pager" *ngIf="totalPages > 1">
+          Page <input type="number" [value]="page" class="page-input" readonly> of {{ totalPages }}
+          <button class="pager-btn" (click)="prevPage()" [disabled]="page === 1">&lt;</button>
+          <button class="pager-btn" (click)="nextPage()" [disabled]="page === totalPages">&gt;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="loading-msg" *ngIf="loading">Loading products...</div>
+
+    <div class="product-grid" *ngIf="!loading">
+      <a class="product-card" *ngFor="let l of filtered" [routerLink]="['/crop', l._id]">
+        <div class="card-img-wrap">
+          <img [src]="getImage(l)" [alt]="l.crop_name" class="card-img" loading="lazy">
+          <span class="card-badge" *ngIf="l.status !== 'available'">{{ l.status | titlecase }}</span>
+        </div>
+        <div class="card-body">
+          <p class="card-cat">{{ getCatName(l) }}</p>
+          <h4 class="card-name">{{ l.crop_name }}</h4>
+          <p class="card-desc">{{ l.description }}</p>
+          <div class="card-footer">
+            <span class="card-price">₱{{ l.price_per_kg }}/{{ l.unit }}</span>
+            <button class="btn-add" (click)="addToCart(l, $event)" *ngIf="l.status === 'available'">+ Add</button>
+          </div>
+        </div>
+      </a>
+      <div class="empty-state" *ngIf="filtered.length === 0">
+        <p>No products found.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<app-footer></app-footer>

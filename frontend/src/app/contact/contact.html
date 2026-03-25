@@ -1,0 +1,52 @@
+<app-navbar></app-navbar>
+<div class="contact-page" @fadeUp>
+  <div class="contact-wrap">
+
+    <div class="success-banner" *ngIf="submitted">
+      ✅ Your message has been sent! We'll get back to you soon.
+    </div>
+
+    <div class="contact-card">
+      <div class="card-top-rule"></div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group" [class.error]="hasError('firstName')">
+            <label>First Name</label>
+            <input formControlName="firstName" type="text">
+            <span class="err-msg" *ngIf="hasError('firstName')">Required</span>
+          </div>
+          <div class="form-group" [class.error]="hasError('lastName')">
+            <label>Last Name</label>
+            <input formControlName="lastName" type="text">
+            <span class="err-msg" *ngIf="hasError('lastName')">Required</span>
+          </div>
+        </div>
+
+        <div class="form-group" [class.error]="hasError('email')">
+          <label>Email Address</label>
+          <input formControlName="email" type="email">
+          <span class="err-msg" *ngIf="hasError('email')">Valid email required</span>
+        </div>
+
+        <div class="form-group" [class.error]="hasError('phone')">
+          <label>Phone Number</label>
+          <input formControlName="phone" type="tel">
+          <span class="err-msg" *ngIf="hasError('phone')">Required</span>
+        </div>
+
+        <div class="form-group" [class.error]="hasError('message')">
+          <label>Reason for Contact</label>
+          <textarea formControlName="message" rows="5"></textarea>
+          <span class="err-msg" *ngIf="hasError('message')">Minimum 10 characters</span>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-clear" (click)="onClear()">Clear</button>
+          <button type="submit" class="btn-submit">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>

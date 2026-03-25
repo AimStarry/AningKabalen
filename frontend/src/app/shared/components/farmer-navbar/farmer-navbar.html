@@ -1,0 +1,32 @@
+<nav class="farmer-nav">
+  <a routerLink="/farmer" class="f-brand">
+    🌾 AningKabalen <span class="f-brand-sub">Farmer Portal</span>
+  </a>
+
+  <div class="f-links">
+    <a routerLink="/farmer"              routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="f-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="link-label">Dashboard</span>
+    </a>
+    <a routerLink="/farmer/listings"     routerLinkActive="active" class="f-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span class="link-label">Add Listing</span>
+    </a>
+    <a routerLink="/farmer/my-listing"   routerLinkActive="active" class="f-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span class="link-label">My Listings</span>
+    </a>
+    <a routerLink="/farmer/transactions" routerLinkActive="active" class="f-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="link-label">Transactions</span>
+    </a>
+  </div>
+
+  <div class="f-right">
+    <div class="f-user">
+      <div class="f-avatar">{{ auth.currentUser()?.name?.charAt(0) ?? 'F' }}</div>
+      <span>{{ auth.currentUser()?.name?.split(' ')?.[0] ?? 'Farmer' }}</span>
+    </div>
+    <button class="f-logout" (click)="auth.logout()">Sign Out</button>
+  </div>
+</nav>

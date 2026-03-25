@@ -1,0 +1,17 @@
+.sidebar{width:220px;background:linear-gradient(170deg,#1a3a1a 0%,#0f2018 100%);min-height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:24px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar-logo h1{font-family:var(--font-display);font-size:1.15rem;color:#fff;font-weight:700;letter-spacing:-.3px}
+.sidebar-logo span{font-size:.62rem;color:var(--g300);letter-spacing:2px;text-transform:uppercase;font-weight:600;display:block;margin-top:3px}
+.sidebar-nav{padding:12px 0;flex:1;overflow-y:auto}
+.nav-label{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.28);padding:12px 20px 4px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;color:rgba(255,255,255,.55);cursor:pointer;border-left:3px solid transparent;font-size:.875rem;font-weight:400;text-decoration:none;transition:all .2s}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff;padding-left:24px}
+.nav-item.active{background:rgba(255,255,255,.1);color:#fff;border-left-color:var(--g400);font-weight:600}
+.ni{font-size:.95rem;width:20px;text-align:center;flex-shrink:0}
+.sidebar-user{padding:14px 20px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.s-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--g400),var(--forest2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;flex-shrink:0}
+.s-name{font-size:.8rem;font-weight:600;color:#fff}
+.s-role{font-size:.68rem;color:rgba(255,255,255,.4)}
+.sidebar-footer{padding:12px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.logout-btn{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--r-md);color:rgba(255,255,255,.55);cursor:pointer;font-size:.82rem;font-family:var(--font-sans);padding:9px 14px;width:100%;transition:all .2s}
+.logout-btn:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5}

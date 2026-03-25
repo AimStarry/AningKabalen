@@ -1,0 +1,179 @@
+<app-navbar></app-navbar>
+
+<div class="checkout-page" @fadeUp>
+  <div class="checkout-wrap">
+    <div class="checkout-page-head">
+      <h1>Checkout</h1>
+    </div>
+
+    <!-- REDIRECT if empty -->
+    <div class="empty-cart-msg" *ngIf="cart.checkoutItems().length === 0 && !submitted">
+      <p>Your cart is empty. <a routerLink="/products">Shop now →</a></p>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-wrap" *ngIf="submitted">
+      <div class="success-icon">✅</div>
+      <h2>Order Placed!</h2>
+      <p>Thank you! Your order has been submitted. The farmer will confirm shortly.</p>
+      <div class="success-actions">
+        <a routerLink="/profile" class="btn-primary">View My Orders</a>
+        <a routerLink="/products" class="btn-secondary">Continue Shopping</a>
+      </div>
+    </div>
+
+    <div class="checkout-layout" *ngIf="cart.checkoutItems().length > 0 && !submitted">
+
+      <!-- LEFT: Details form -->
+      <div class="checkout-form">
+
+        <!-- Farm scope banner -->
+        <div class="farm-scope-banner" *ngIf="cart.checkoutFarm()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          Ordering only from <strong>{{ cart.checkoutFarm() }}</strong>
+          <a routerLink="/cart" class="scope-change">Change</a>
+        </div>
+
+        <h3>Delivery Details</h3>
+        <div class="error-msg" *ngIf="error">{{ error }}</div>
+
+        <div class="form-group">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="name" placeholder="Juan dela Cruz" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>Phone Number <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="phone" placeholder="+63 917 000 0000" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>Delivery Address <span class="req">*</span></label>
+          <textarea [(ngModel)]="address" placeholder="Street, Barangay, Municipality, Province, ZIP" class="form-input" rows="3"></textarea>
+        </div>
+
+        <h3>Payment Method</h3>
+        <div class="payment-opts">
+          <label class="pay-opt" [class.active]="payment === 'gcash'">
+            <input type="radio" [(ngModel)]="payment" value="gcash" name="payment"> GCash
+          </label>
+          <label class="pay-opt" [class.active]="payment === 'maya'">
+            <input type="radio" [(ngModel)]="payment" value="maya" name="payment"> Maya
+          </label>
+          <label class="pay-opt" [class.active]="payment === 'cod'">
+            <input type="radio" [(ngModel)]="payment" value="cod" name="payment"> Cash on Delivery
+          </label>
+          <label class="pay-opt" [class.active]="payment === 'visa'">
+            <input type="radio" [(ngModel)]="payment" value="visa" name="payment"> Visa / Card
+          </label>
+        </div>
+
+        <div class="checkout-form-actions">
+          <a routerLink="/cart" class="checkout-form-back">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10H5M10 5l-5 5 5 5"/></svg>
+            Back to Cart
+          </a>
+          <button class="checkout-clear-btn" (click)="clearAndCancel()">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h8M4 5h12l-1 12H5L4 5z"/></svg>
+            Clear Cart
+          </button>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Receipt-style summary -->
+      <div class="receipt-card">
+
+        <!-- Receipt header -->
+        <div class="receipt-header">
+          <div class="receipt-store-row">
+            <span class="receipt-logo">🌾</span>
+            <div>
+              <p class="receipt-store-name">AningKabalen</p>
+              <p class="receipt-store-sub">Fresh from local farms</p>
+            </div>
+          </div>
+          <div class="receipt-meta-row">
+            <span class="receipt-label">ORDER RECEIPT</span>
+            <span class="receipt-date">{{ today }}</span>
+          </div>
+          <div class="receipt-farm-tag" *ngIf="cart.checkoutFarm()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            {{ cart.checkoutFarm() }}
+          </div>
+        </div>
+
+        <!-- Perforation line -->
+        <div class="receipt-perf"></div>
+
+        <!-- Items -->
+        <div class="receipt-items">
+          <div class="receipt-col-heads">
+            <span>ITEM</span>
+            <span>QTY</span>
+            <span>AMOUNT</span>
+          </div>
+          <div class="receipt-item" *ngFor="let item of cart.checkoutItems()">
+            <div class="receipt-item-left">
+              <img [src]="item.imageUrl || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=60'"
+                   class="receipt-img" [alt]="item.name">
+              <div>
+                <p class="receipt-item-name">{{ item.name }}</p>
+                <p class="receipt-item-unit">₱{{ item.price }}/{{ item.unit }}</p>
+              </div>
+            </div>
+            <span class="receipt-qty">× {{ item.qty }}</span>
+            <span class="receipt-item-total">₱{{ (item.price * item.qty).toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <!-- Perforation line -->
+        <div class="receipt-perf"></div>
+
+        <!-- Totals -->
+        <div class="receipt-totals">
+          <div class="receipt-t-row">
+            <span>Subtotal</span>
+            <span>₱{{ subtotal.toFixed(2) }}</span>
+          </div>
+          <div class="receipt-t-row fee-row">
+            <span>Platform fee <span class="fee-pill">2%</span></span>
+            <span>₱{{ fee.toFixed(2) }}</span>
+          </div>
+          <div class="receipt-t-row grand-row">
+            <span>TOTAL</span>
+            <span class="grand-amt">₱{{ grand.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <!-- Perforation line -->
+        <div class="receipt-perf"></div>
+
+        <!-- CTA -->
+        <div class="receipt-cta">
+          <button class="btn-place" (click)="placeOrder()"
+                  [disabled]="loading || !address.trim()">
+            {{ loading ? 'Processing...' : '🛒 Place Order' }}
+          </button>
+          <a routerLink="/cart" class="btn-back-link">← Back to Cart</a>
+        </div>
+
+        <!-- Receipt footer -->
+        <div class="receipt-footer">
+          <p>Thank you for supporting local farmers!</p>
+          <div class="receipt-trust">
+            <span>🔒 Secure</span>
+            <span>·</span>
+            <span>✅ Verified</span>
+            <span>·</span>
+            <span>2% fee only</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

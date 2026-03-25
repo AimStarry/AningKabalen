@@ -1,0 +1,59 @@
+<app-navbar></app-navbar>
+
+<div class="viewall-page">
+  <nav class="breadcrumb" @fadeUp>
+    <a routerLink="/home">Home</a> &rsaquo; <a routerLink="/products">Goods</a> &rsaquo;
+    <span class="crumb-active">{{ title }}</span>
+  </nav>
+
+  <div class="page-head" @fadeUp>
+    <h1>{{ title }}</h1>
+    <div class="filters">
+      <div class="search-box">
+        <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm" (change)="onFilterChange()">
+        <svg viewBox="0 0 20 20" fill="none" stroke="#9ca3af" stroke-width="1.8" width="16" height="16"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/></svg>
+      </div>
+      <select [(ngModel)]="selectedCategory" (change)="onFilterChange()" class="filter-sel">
+        <option value="">All Categories</option>
+        <option *ngFor="let c of categories" [value]="c._id">{{ c.name }}</option>
+      </select>
+      <select [(ngModel)]="selectedFarm" (change)="onFilterChange()" class="filter-sel">
+        <option value="">All Farms</option>
+        <option *ngFor="let f of farms" [value]="f._id">{{ f.farm_name }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="loading-msg" *ngIf="loading">Loading products...</div>
+
+  <div class="products-grid" [@stagger]="filtered.length" *ngIf="!loading">
+    <a class="product-card" *ngFor="let p of filtered" [routerLink]="['/crop', p._id]">
+      <div class="card-img-wrap">
+        <img [src]="getImage(p)" [alt]="p.crop_name" class="card-img" loading="lazy">
+      </div>
+      <div class="card-body">
+        <p class="card-cat">{{ getCatName(p) }}</p>
+        <h4 class="card-name">{{ p.crop_name }}</h4>
+        <p class="card-desc">{{ p.description }}</p>
+        <div class="card-footer">
+          <span class="card-price">₱{{ p.price_per_kg }}/{{ p.unit }}</span>
+          <button class="add-btn" (click)="addToCart(p, $event)">+ Add</button>
+        </div>
+      </div>
+    </a>
+    <div class="empty-state" *ngIf="filtered.length === 0">
+      <span>🔍</span>
+      <p>No products found.</p>
+    </div>
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button class="pager-btn" (click)="prevPage()" [disabled]="page === 1">‹ Prev</button>
+    <span>Page {{ page }} of {{ totalPages }}</span>
+    <button class="pager-btn" (click)="nextPage()" [disabled]="page === totalPages">Next ›</button>
+  </div>
+</div>
+
+<app-footer></app-footer>
+<app-toast></app-toast>

@@ -1,0 +1,226 @@
+<app-navbar></app-navbar>
+
+<div class="cart-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-head">
+    <div class="page-head-left">
+      <div class="page-title-wrap">
+        <span class="cart-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+        </span>
+        <div>
+          <h1 class="page-title">My Cart</h1>
+          <p class="item-count" *ngIf="cart.items().length > 0">
+            {{ cart.count() }} item(s) from {{ groupedItems().length }} farm(s)
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="page-head-right">
+      <a routerLink="/products" class="btn-continue">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10H5M10 5l-5 5 5 5"/></svg>
+        Continue Shopping
+      </a>
+      <button class="btn-clear-all" *ngIf="cart.items().length > 0" (click)="clearCart()">
+        Clear All
+      </button>
+    </div>
+  </div>
+
+  <!-- FRESHNESS BANNER -->
+  <div class="freshness-banner" *ngIf="cart.items().length > 0">
+    <span class="freshness-dot"></span>
+    <span>All items sourced directly from verified local farms · Fresh guaranteed</span>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="cart-empty" *ngIf="cart.items().length === 0">
+    <div class="empty-basket">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--g300)" stroke-width="1.2">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+      <div class="empty-veggies">🥦🍅🥕</div>
+    </div>
+    <h3>Your basket is empty</h3>
+    <p>Browse fresh produce from local farms and fill it up!</p>
+    <a routerLink="/products" class="btn-shop-now">
+      🛒 Shop Fresh Produce
+    </a>
+  </div>
+
+  <!-- CART LAYOUT -->
+  <div class="cart-layout" *ngIf="cart.items().length > 0">
+
+    <!-- LEFT: Farm-grouped items -->
+    <div class="cart-groups">
+
+      <div class="farm-card" *ngFor="let group of groupedItems(); let i = index">
+
+        <!-- Farm Header -->
+        <div class="farm-card-head">
+          <div class="farm-identity">
+            <div class="farm-avatar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+            </div>
+            <div>
+              <span class="farm-name">{{ group.farmName }}</span>
+              <span class="farm-badge">Local Farm</span>
+            </div>
+          </div>
+          <div class="farm-head-right">
+            <span class="farm-item-count">{{ group.items.length }} item{{ group.items.length > 1 ? 's' : '' }}</span>
+            <button class="btn-checkout-farm" (click)="checkoutFarm(group.farmName)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 01-8 0"/>
+              </svg>
+              Checkout this order
+            </button>
+            <button class="btn-clear-farm" (click)="clearFarm(group.farmName)">
+              <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h8M4 5h12l-1 12H5L4 5z"/></svg>
+              Remove all
+            </button>
+          </div>
+        </div>
+
+        <!-- Items List -->
+        <div class="items-list">
+          <div class="cart-item" *ngFor="let item of group.items; let last = last" [class.last-item]="last">
+            <div class="item-img-wrap">
+              <img
+                [src]="item.imageUrl || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=120'"
+                [alt]="item.name"
+                class="item-img">
+              <span class="fresh-tag">Fresh</span>
+            </div>
+            <div class="item-info">
+              <p class="item-name">{{ item.name }}</p>
+              <p class="item-unit-price">₱{{ item.price }} / {{ item.unit }}</p>
+              <p class="item-farm-tag">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                {{ item.farmName }}
+              </p>
+            </div>
+            <div class="item-right">
+              <div class="qty-ctrl">
+                <button class="qty-btn minus" (click)="updateQty(item, item.qty - 1)">−</button>
+                <span class="qty-val">{{ item.qty }}</span>
+                <button class="qty-btn plus" (click)="updateQty(item, item.qty + 1)">+</button>
+              </div>
+              <div class="item-subtotal-wrap">
+                <span class="item-subtotal">₱{{ (item.price * item.qty).toFixed(2) }}</span>
+                <span class="item-qty-label">{{ item.qty }} × ₱{{ item.price }}</span>
+              </div>
+              <button class="remove-btn" (click)="remove(item)" title="Remove item">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 2h8M4 5h12l-1 12H5L4 5z"/>
+                  <path d="M8 8v6M12 8v6"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Farm Footer -->
+        <div class="farm-card-footer">
+          <div class="farm-footer-left">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--g600)" stroke-width="2">
+              <path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span class="farm-footer-label">Direct from {{ group.farmName }}</span>
+          </div>
+          <div class="farm-subtotal-right">
+            <span class="farm-subtotal-label">Farm total</span>
+            <span class="farm-subtotal-value">₱{{ farmSubtotal(group).toFixed(2) }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: Order Summary -->
+    <div class="cart-summary">
+
+      <div class="summary-header">
+        <h3 class="summary-title">Order Summary</h3>
+        <span class="summary-item-badge">{{ cart.count() }} items</span>
+      </div>
+
+      <!-- Farm breakdown -->
+      <div class="summary-farms">
+        <p class="summary-section-label">By Farm</p>
+        <div class="summary-farm-row" *ngFor="let group of groupedItems()">
+          <div class="summary-farm-name-wrap">
+            <span class="summary-farm-dot"></span>
+            <span class="summary-farm-name">{{ group.farmName }}</span>
+          </div>
+          <span class="summary-farm-amt">₱{{ farmSubtotal(group).toFixed(2) }}</span>
+        </div>
+      </div>
+
+      <div class="summary-divider"></div>
+
+      <div class="summary-row"><span>Subtotal</span><span>₱{{ cart.total().toFixed(2) }}</span></div>
+      <div class="summary-row fee"><span>Platform fee <span class="fee-badge">2%</span></span><span>₱{{ (cart.total() * 0.02).toFixed(2) }}</span></div>
+      <div class="summary-row total">
+        <span>Total Amount</span>
+        <span class="total-amt">₱{{ (cart.total() * 1.02).toFixed(2) }}</span>
+      </div>
+
+      <!-- CTA Buttons -->
+      <div class="action-buttons">
+        <button (click)="checkoutAll()" class="btn-checkout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          Place Order Now
+        </button>
+        <a routerLink="/reservation" class="btn-reserve">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          Reserve Instead
+        </a>
+      </div>
+
+      <div class="action-explainer">
+        <div class="explainer-row"><span class="explainer-dot order"></span><span><strong>Order</strong> — buy from available stock now</span></div>
+        <div class="explainer-row"><span class="explainer-dot reserve"></span><span><strong>Reserve</strong> — pre-book, farmer confirms in 48h</span></div>
+      </div>
+
+      <div class="trust-strip">
+        <div class="trust-item">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="var(--g500)"><path fill-rule="evenodd" d="M10 1l7 3v6c0 4-3 7-7 8C3 17 0 14 0 10V4l10-3z"/></svg>
+          <span>Secure</span>
+        </div>
+        <div class="trust-sep">·</div>
+        <div class="trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--g500)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <span>Verified Farms</span>
+        </div>
+        <div class="trust-sep">·</div>
+        <div class="trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--g500)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span>2% fee only</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

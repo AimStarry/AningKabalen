@@ -1,0 +1,105 @@
+<app-farmer-navbar></app-farmer-navbar>
+
+<div class="dash-wrap">
+  <div class="greeting">
+    <p class="greeting-time">{{ today }}</p>
+    <h1>Hello, <span>{{ auth.currentUser()?.name?.split(' ')?.[0] ?? 'Farmer' }}</span>! 👋</h1>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon green">💰</div>
+      <span class="stat-label">Total Earnings</span>
+      <div class="stat-value">₱{{ stats.totalEarning | number:'1.0-0' }}</div>
+      <span class="stat-sub">Completed transactions</span>
+      <div class="stat-card-accent green"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber">📋</div>
+      <span class="stat-label">Pending Reservations</span>
+      <div class="stat-value">{{ stats.pendingReservations }}</div>
+      <span class="stat-sub">Awaiting your confirmation</span>
+      <div class="stat-card-accent amber"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon teal">🛒</div>
+      <span class="stat-label">Active Orders</span>
+      <div class="stat-value">{{ stats.pendingOrders }}</div>
+      <span class="stat-sub">Direct orders to fulfill</span>
+      <div class="stat-card-accent teal"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue">🌾</div>
+      <span class="stat-label">My Listings</span>
+      <div class="stat-value">{{ crops.length }}</div>
+      <span class="stat-sub">Active crop listings</span>
+      <div class="stat-card-accent blue"></div>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="quick-actions">
+    <a routerLink="/farmer/listings" class="qa-btn">
+      <span class="qa-icon">➕</span>
+      <div class="qa-text">Add New Listing<small>Post a new crop for sale</small></div>
+    </a>
+    <a routerLink="/farmer/transactions" class="qa-btn">
+      <span class="qa-icon">📋</span>
+      <div class="qa-text">
+        Manage Reservations
+        <small>{{ stats.pendingReservations }} pending</small>
+      </div>
+    </a>
+    <a routerLink="/farmer/my-listing" class="qa-btn">
+      <span class="qa-icon">📦</span>
+      <div class="qa-text">My Listings<small>View and manage stock</small></div>
+    </a>
+  </div>
+
+  <div class="loading-msg" *ngIf="loading">Loading your data...</div>
+
+  <!-- CROP TABLE -->
+  <div class="table-card" *ngIf="!loading">
+    <div class="table-head">
+      <h3>My Crop Listings</h3>
+      <a routerLink="/farmer/my-listing" class="table-view-all">View All →</a>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Crop</th><th>Category</th><th>Qty Available</th><th>Price/kg</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let crop of crops.slice(0,5)">
+          <td class="td-bold">{{ crop.crop_name }}</td>
+          <td>{{ getCategoryName(crop) }}</td>
+          <td>{{ crop.available_kg }} {{ crop.unit }}</td>
+          <td>₱{{ crop.price_per_kg }}</td>
+          <td><span class="pill" [ngClass]="getStatusClass(crop.status)">{{ crop.status | titlecase }}</span></td>
+        </tr>
+        <tr class="empty-row" *ngIf="crops.length===0"><td colspan="5">No listings yet. <a routerLink="/farmer/listings">Add your first crop →</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TRANSACTIONS TABLE -->
+  <div class="table-card" *ngIf="!loading">
+    <div class="table-head">
+      <h3>Recent Transactions</h3>
+      <a routerLink="/farmer/transactions" class="table-view-all">View All →</a>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Buyer</th><th>Crop</th><th>Qty</th><th>Total</th><th>Type</th><th>Date</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let txn of transactions.slice(0,6)">
+          <td class="td-bold">{{ getBuyerName(txn) }}</td>
+          <td>{{ getCropName(txn) }}</td>
+          <td>{{ txn.quantity_kg }} kg</td>
+          <td>{{ formatCurrency(txn.total_amount) }}</td>
+          <td><span class="pill pill-blue">{{ txn.type | titlecase }}</span></td>
+          <td class="td-date">{{ txn.created_at | date:'mediumDate' }}</td>
+          <td><span class="pill" [ngClass]="getStatusClass(txn.status)">{{ txn.status | titlecase }}</span></td>
+        </tr>
+        <tr class="empty-row" *ngIf="transactions.length===0"><td colspan="7">No transactions yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,110 @@
+<app-farmer-navbar></app-farmer-navbar>
+
+<div class="page-wrap" @fadeUp>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar-row">
+    <div class="toolbar-left">
+      <h1 class="page-title">My Listings</h1>
+      <span class="count-badge" *ngIf="!loading">{{ filtered.length }} crop{{ filtered.length !== 1 ? 's' : '' }}</span>
+    </div>
+    <div class="toolbar-right">
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="var(--gray400)" stroke-width="1.8"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M15 15l-3-3"/></svg>
+        <input type="text" placeholder="Search crop..." [(ngModel)]="searchTerm" class="search-input">
+      </div>
+      <a routerLink="/farmer/listings" class="btn-add-link">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 4v12M4 10h12"/></svg>
+        Add New Crop
+      </a>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-wrap" *ngIf="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" *ngIf="!loading && filtered.length === 0">
+    <div class="empty-illustration">🌾</div>
+    <h3>{{ searchTerm ? 'No crops match your search.' : 'No listings yet.' }}</h3>
+    <p>{{ searchTerm ? 'Try a different keyword.' : 'Start adding your fresh produce so buyers can find you.' }}</p>
+    <a routerLink="/farmer/listings" class="btn-add-link" *ngIf="!searchTerm">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 4v12M4 10h12"/></svg>
+      Add Your First Crop
+    </a>
+  </div>
+
+  <!-- CARD GRID -->
+  <div class="crop-grid" *ngIf="!loading && filtered.length > 0">
+    <div class="crop-card" *ngFor="let l of filtered" @cardIn>
+
+      <!-- Image -->
+      <div class="card-img-wrap">
+        <img *ngIf="getImage(l)" [src]="getImage(l)" [alt]="l.crop_name" class="card-img">
+        <div class="card-img-placeholder" *ngIf="!getImage(l)">
+          <span>🌾</span>
+        </div>
+        <!-- Status badge overlaid on image -->
+        <span class="card-status-badge" [ngClass]="getStatusClass(l.status)">
+          {{ l.status | titlecase }}
+        </span>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body">
+        <div class="card-title-row">
+          <div>
+            <h3 class="card-crop-name">{{ l.crop_name }}</h3>
+            <p class="card-variety" *ngIf="l.variety">{{ l.variety }}</p>
+          </div>
+          <span class="card-price">₱{{ l.price_per_kg }}<span class="card-unit">/{{ l.unit }}</span></span>
+        </div>
+
+        <p class="card-category">
+          <svg width="11" height="11" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg>
+          {{ getCategoryName(l) }}
+        </p>
+
+        <!-- Stock bars -->
+        <div class="card-stock">
+          <div class="stock-row">
+            <span class="stock-label">Total Stock</span>
+            <span class="stock-val">{{ l.quantity_kg }} {{ l.unit }}</span>
+          </div>
+          <div class="stock-row">
+            <span class="stock-label">Available</span>
+            <span class="stock-val avail" [class.low]="l.available_kg / l.quantity_kg < 0.2">
+              {{ l.available_kg }} {{ l.unit }}
+            </span>
+          </div>
+          <!-- Stock progress bar -->
+          <div class="stock-bar-wrap">
+            <div class="stock-bar-track">
+              <div class="stock-bar-fill"
+                   [style.width.%]="(l.available_kg / l.quantity_kg) * 100"
+                   [class.low]="l.available_kg / l.quantity_kg < 0.2">
+              </div>
+            </div>
+            <span class="stock-pct">{{ ((l.available_kg / l.quantity_kg) * 100).toFixed(0) }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer actions -->
+      <div class="card-footer">
+        <a [routerLink]="['/farmer/listings']" [queryParams]="{edit: l._id}" class="card-btn-edit">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4l5 5-9 9H2v-5L11 4z"/></svg>
+          Edit
+        </a>
+        <button class="card-btn-delete" (click)="deleteListing(l._id)">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h8M4 5h12l-1 12H5L4 5z"/><path d="M8 8v6M12 8v6"/></svg>
+          Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
