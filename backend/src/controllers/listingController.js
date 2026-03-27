@@ -11,7 +11,7 @@ const s3 = new S3Client({
   },
 });
 
-const BUCKET = 'aning-kabalen';
+const BUCKET = 'aningkabalen-product-image';
 
 const extractKeyFromUrl = (url) => {
   try {
@@ -32,7 +32,7 @@ const getAllListings = async (req, res, next) => {
         .populate('farmer_id', 'name avatar_url farm_details rating')
         .populate('category_id', 'name slug'),
       req.query
-    ).filter().search(['crop_name','description','tags']).sort().paginate();
+    ).filter().search(['crop_name', 'description', 'tags']).sort().paginate();
 
     const [listings, total] = await Promise.all([
       features.query,
