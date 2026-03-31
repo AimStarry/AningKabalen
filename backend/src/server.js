@@ -25,11 +25,26 @@ const app = express();
 const PORT = process.env.PORT ?? 5000;
 const isDev = process.env.NODE_ENV !== 'production';
 
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',')
+  : ['http://localhost:4200'];
+
 app.use(helmet());
+
 app.use(cors({
-  origin: process.env.CLIENT_URL ?? 'http://localhost:4200',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
 }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 if (!isDev) app.use(morgan('combined'));
