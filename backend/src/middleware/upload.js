@@ -14,7 +14,7 @@ const s3 = new S3Client({
 
 const storage = multerS3({
   s3,
-  bucket: 'aningkabalen-product-image',
+  bucket: process.env.S3_BUCKET,
   contentType: multerS3.AUTO_CONTENT_TYPE,
   metadata: (_req, file, cb) => cb(null, { fieldName: file.fieldname }),
   key: (_req, file, cb) => {
