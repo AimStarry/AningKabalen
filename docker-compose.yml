@@ -1,0 +1,26 @@
+services:
+
+  backend:
+    build:
+      context: ./backend
+    container_name: aningkabalen-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: aningkabalen-frontend
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: ./nginx
+    container_name: aningkabalen-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
